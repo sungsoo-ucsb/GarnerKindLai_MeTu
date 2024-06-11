@@ -6,8 +6,6 @@ OS: All scripts were developed in MacOS.
 
 Versions and required packages: See the Key Resources Table for required software. Installation instructions of those packages can be found in the link provided in the Key Resources Table. Installation of these required packages may vary depending on the computer specifications. Our code does not require special installation. After downloading (or clone) the code, each files can be run to replicate the results.
 
-TODO:
-Update all these readme files.
 
 
 
