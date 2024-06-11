@@ -34,26 +34,23 @@ Statistics and Machine Learning Toolbox
 
 ## Installation
 
-All necessary packages for R, Python, and Matlab should be installed. Installation instructions can be found at homepages of those packages. We used the most recent packages as of March, 2024.
+All necessary packages for R, Python, and Matlab should be installed. Installation instructions can be found at homepages of those packages. We used the most recent packages as of March, 2024. Installation time for these packages depend on the computer specification. Please see the homepage of each packages.
 
 There is no required hardware other than a computer that can run R, Python, and Matlab (most recent versions as of March, 2024).
 
-Git clone or download the current repository.
+Git clone or download the current repository. Cloning or downloading time is typically less than 1 minute.
 
 
 ## Running the code.
 
-EM analyses: Run the main script in the folder.
+EM analyses: Run the main script in the folder to replicate analyses and produce figures. Each section of code analyze the data and generate figures. The analyses time varies widely (some analyses, such as scanning the entire database to identify visual pathways to the central complex, may take a few hours).
 
-Two-photon calcium imaging: Run the main_analysis script. Raw imaging files will be provided upon request. Intermediate data files are available in each folder.
-
-
+Two-photon calcium imaging: Run plot_script files in each of the figure folder to generate plots in the figures. (Raw imaging files will be provided upon request. Intermediate data files are available in each folder.)
 
 
+## Other notes
 
-
-See the Key Resources Table for required software. Installation instructions of those packages can be found in the link provided in the Key Resources Table. Installation of these required packages may vary depending on the computer specifications. Our code does not require special installation. After downloading (or clone) the code, each files can be run to replicate the results.
-
+Users must have a FlyWire account and an API token to run EM analyses code. Check out https://flywire.ai for more details.
 
 
 
