@@ -17,9 +17,35 @@ alphashape3d	https://CRAN.R-project.org/package=alphashape3d
 
 ### Python 3
 
+numpy https://numpy.org/install/
+
+pandas https://pandas.pydata.org/docs/getting_started/index.html
+
+matplotlib https://matplotlib.org/stable/
+
+seaborn https://seaborn.pydata.org/installing.html
+
+pydantic https://docs.pydantic.dev/latest/install/
+
+scipy https://scipy.org/install/
+
+navis https://navis.readthedocs.io/en/latest/source/install.html
+
+caveclient https://caveclient.readthedocs.io/en/latest/guide/intro.html
+
+cloudvolume https://github.com/seung-lab/cloud-volume
+
 pymaid	https://github.com/schlegelp/PyMaid
 
 FAFBseg	https://github.com/flyconnectome/fafbseg-py
+
+bokeh https://docs.bokeh.org/en/latest/docs/first_steps.html#first-steps
+
+holoviews https://www.holoviews.org/
+
+hvplot https://hvplot.holoviz.org/getting_started/installation.html
+
+neuprint https://connectome-neuprint.github.io/neuprint-python/docs/
 
 ### Matlab
 
