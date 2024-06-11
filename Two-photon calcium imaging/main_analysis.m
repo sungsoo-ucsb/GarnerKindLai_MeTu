@@ -1,6 +1,10 @@
+
+%download sample dataset from https://sungsoo-nas1.mcdb.ucsb.edu:5001/sharing/nU6uifCJC
+
 clear
 
-addpath(genpath('Z:\jennifer\Ring neurons\single_dot_blue\for github\Two-photon calcium imaging\Matlab function'))
+addpath(genpath([pwd '\Matlab function']))
+addpath(genpath([pwd '\Sample dataset']))
 
 temp_dir = dir('parameters_*.mat');
 load(temp_dir.name)
