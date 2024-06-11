@@ -29,7 +29,6 @@ import flycode.metu_comparison as comparison
 import flycode.annotations as annotations
 import flycode.volumes as volumes
 import flycode.flywire_functions as fw
-import flycode.graphics as graphics
 import flycode.figures as figures
 
 
