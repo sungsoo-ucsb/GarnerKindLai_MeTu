@@ -189,35 +189,6 @@ def import_colors():
     return new_colors
 
 
-def import_synapses():
-    """Imports the synapse spreadsheet from Codex.
-
-    Returns
-    -------
-    A dataframe with all of the synapses, limited to 5 connections.
-    """
-    df = import_file("Codex Synapse Coordinates", file_type="csv", dtype=str)
-    def convert_series(series):
-        series = np.asarray(series)
-        temp_value = series[0]
-        for indi, i in enumerate(series):
-            if math.isnan(float(i)):
-                series[indi] = temp_value
-            else:
-                temp_value = i
-        series = np.asarray(series, dtype=np.int64)
-        return pd.Series(series)
-    
-    for i in [f"{x}_root_id" for x in ["pre", "post"]]:
-        df[i] = convert_series(df[i])
-    df = df.rename(columns = {f"{x}_root_id": x for x in ["pre", "post"]})    
-    for i in "xyz":
-        df[i] = df[i].astype("int")
-    return df
-
-
-
-
 
 
 
