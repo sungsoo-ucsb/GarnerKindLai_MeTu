@@ -162,4 +162,7 @@ cython_debug/
 #.idea/
 
 # Generated Figures
-.EM-Analyses/flycode/Generated-Figures/
+EM-Analyses/Python/flycode/Generated-Figures/
+
+# Large Readable Files
+EM-Analyses/Python/flycode/Readable/
