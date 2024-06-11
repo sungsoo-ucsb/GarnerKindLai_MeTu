@@ -3,7 +3,7 @@
 """
 Created on Thu Nov  2 12:26:37 2023
 
-@author: dustin
+@author: Dustin Garner
 """
 import math
 import datetime

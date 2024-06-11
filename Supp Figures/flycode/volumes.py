@@ -3,17 +3,20 @@
 """
 Created on Fri Nov 17 09:24:49 2023
 
-@author: dustin
+@author: Dustin Garner
 """
+
 
 from collections import defaultdict 
 import numpy as np
 import pandas as pd
+import scipy.stats as stats 
 import matplotlib.pyplot as plt
 from fafbseg import flywire
 import flycode.utils as utils
 import flycode.readfiles as readfiles
 import flycode.flywire_functions as fw
+import flycode.figures as figures
 
 
 def make_change_log():
@@ -186,7 +189,8 @@ def get_f1_synapses(before_id, after_id):
                                  false_positive_voxels,
                                  false_negative_voxels))
     
-    all_ids = np.unique(flywire.supervoxels_to_roots(all_voxels))
+    all_ids = np.unique(flywire.supervoxels_to_roots(all_voxels, 
+                                                timestamp=f"mat_{fw.version}"))
     syn_df = fw.fetch_synapses(all_ids)
     
     true_positive = len(\
@@ -199,6 +203,12 @@ def get_f1_synapses(before_id, after_id):
             syn_df[(syn_df["pre_supervoxel"].isin(false_negative_voxels))
                  | (syn_df["post_supervoxel"].isin(false_negative_voxels))])
     
+    try:
+        get_f1_score(true_positive, false_negative, false_positive)
+    except:
+        print("Issue", before_id, after_id)
+        return 0
+        
     return get_f1_score(true_positive, false_negative, false_positive)
 
 
@@ -246,33 +256,117 @@ def plot_f1(f1_scores):
     f1_scores : tuple
         Items given by compare_f1_scores().
     """
+    font_size = 6
+    width_prop = {'linewidth': 0.3}
     for i,j in zip(f1_scores, ["Skeletal Node", "Synaptic"]):
         temp_scores = [i[x] for x in i]
         x_labels = np.array(['Round 1', 'Round 2', 'Round 3'])
         
-        fig, ax = plt.subplots(figsize=(7, 4))
+        fig, ax = plt.subplots(figsize=(1.8, 1.2))
         bplot = ax.boxplot(temp_scores,
-                             vert=True,
-                             patch_artist=True)        
+                           vert=True,
+                           patch_artist=True,
+                           flierprops={'marker': '_',
+                                       'markersize': 3,
+                                       'markeredgewidth': 0.3},
+                           boxprops= width_prop,
+                           medianprops=width_prop,
+                           whiskerprops=width_prop,
+                           capprops=width_prop)
         colors = ["#D62728", "#1F77B4", "#2CA02C"]
         for patch, color in zip(bplot['boxes'], colors):
             patch.set_facecolor(color)
+        
             
         for median in bplot['medians']:
             median.set_color('black')
         
-        ax.yaxis.grid(True)
-        ax.set_xlabel('Proofreading Round')
-        ax.set_ylabel(f'{j} F1 Score')
-        plt.xticks(ticks=ax.get_xticks(), labels = x_labels, fontsize = 6)
-        #utils.create_figure(fig, ax, 
-        #                    plot_name=f'{j} F1 Score Per Proofreading Round',
-        #                    rotation=0, 
-        #                    fix_x_labels=False)
+        ax.set_xlabel('Proofreading Round', fontsize=font_size)
+        y_label = f'{j} F1 Score'
+        ax.set_ylabel(y_label, fontsize=font_size)
+        plt.xticks(ticks=ax.get_xticks(), 
+                   labels=x_labels, 
+                   fontsize=font_size)
+        y_labels = [round(x,1) for x in np.arange(0,1.2,0.2)]
+        plt.yticks(ticks=y_labels, 
+                   labels=y_labels, 
+                   fontsize=font_size)
+        figures.save_fig(fig,
+                         f"Fig S1/{y_label}")
         plt.show()
 
 
+def t_test(round_comparison):
+    """Calculates p-values through a paired-samples t-test on a round dict.
+    
+    Parameters
+    ----------
+    round_comparison : dict
+        A dictionary containing the round keys ("before_first", "after_first",
+                                                "before_second")
+        and values are arrays of numbers.
+    
+    Returns
+    -------
+    p_values : dict
+        A dictionary containing the compared p-values.
+    """
+    p_values = {}
+    p_values["First to Second"] = stats.ttest_rel(round_comparison["before_first"],
+                                                  round_comparison["after_first"])
+    p_values["First to Third"] = stats.ttest_rel(round_comparison["before_first"],
+                                                  round_comparison["after_second"])
+    p_values["Second to Third"] = stats.ttest_rel(round_comparison["after_first"],
+                                                   round_comparison["after_second"])
+    return p_values
+    
+def get_round_values():
+    """Gets the round values from the proofreading volume change and number of 
+    edits spreadsheets.
 
+    Returns
+    -------
+    p_values : dict
+        A dictionary containing the compared p-values.
+    """
+    round_dicts = {}
+    round_names = {1: "before_first", 2: "after_first", 3: "after_second"}
+    for i in ["number_of_edits", "volume_change"]:
+        round_comparison = {round_names[x]: [] for x in range(1,4)}
+        temp_file = readfiles.import_file(i, file_type="csv")
+        column = "round" if i=="volume_change" else "Round"
+        value = "size_change" if i=="volume_change" else "edits"
+        ids = np.unique(temp_file.id)
+        temp_file = temp_file.set_index("id")
+        for j in ids:
+            for k in range(1,4):
+                round_name = k if i=="volume_change" else f"round{k}_edits"
+                temp_df = temp_file[temp_file[column]==round_name]
+                temp_value = temp_df.loc[j, value]
+                round_comparison[round_names[k]].append(temp_value)
+        round_dicts[i] = round_comparison
+    return round_dicts
+
+
+def get_all_t_tests(f1_scores):
+    """Prints p-scores from t-tests on each of the four proofreading round
+    data.
+    
+    Parameters
+    ----------
+    f1_scores : tuple
+        The return value of compare_f1_scores().
+    """
+    values = get_round_values()
+    for i in values:
+        print(i)
+        temp_t_test = t_test(values[i])
+        for j in t_test:
+            print(j, temp_t_test[j])
+        print("")
+    for i, j in zip(f1_scores, ["Skeletal F1", "Synapse F1"]):
+        print(j, t_test(i))
+        print("")
 
 
 

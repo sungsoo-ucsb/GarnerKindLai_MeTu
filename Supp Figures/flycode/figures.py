@@ -3,7 +3,7 @@
 """
 Created on Fri Feb  9 14:44:44 2024
 
-@author: dustin
+@author: Dustin Garner
 """
 
 
@@ -26,6 +26,7 @@ edge_color = "white"
 rotation_mode = "anchor"
 loc = "lower left"
 bbox = (1.04, 0)
+
 
 class FileType(Enum):
     PDF = 1
@@ -85,6 +86,21 @@ def save_fig(fig, plot_name, dpi=300, file_type=FileType.PDF,
 
 
 def add_legend(legend=None, marker_scale=1.2):
+    """Makes a legend for a figure.
+
+    Parameters
+    ----------
+    legend : matplotlib.Legend, optional
+        The pre-existing legend, if there is one. The default is None.
+    marker_scale : float, optional
+        The size of legend marker scales. The default is 1.2.
+
+    Returns
+    -------
+    leg : matplotlib.Legend
+        The resulting legend.
+
+    """
     plt_legend = functools.partial(plt.legend,
                                    fontsize=font_size,
                                    bbox_to_anchor=bbox,
@@ -99,7 +115,7 @@ def add_legend(legend=None, marker_scale=1.2):
 
 def strip_plot(data, x_label, y_label, order, hue, palette, plot_name, 
               dodge=True, save_figure=True, fig_size=(2.0, 1.25),
-              show_means=False, size=2.5, lim_range=None):
+              show_means=False, mean_type=".", size=2.5, lim_range=None):
     """Makes a strip plot.
 
     Parameters
@@ -126,6 +142,8 @@ def strip_plot(data, x_label, y_label, order, hue, palette, plot_name,
         The size of the figure. The default is (2.0, 1.25).
     show_means : bool, optional
         Whether to show the means. The default is False.
+    mean_type : str, optional
+        The type of mean line to have. The default is ".".
     size : float, optional
         Radius of the markers. The default is 2.5.
     lim_range : list-like, optional
@@ -158,7 +176,7 @@ def strip_plot(data, x_label, y_label, order, hue, palette, plot_name,
         sns.boxplot(showmeans=True,
                     meanprops={"markerfacecolor": "k",
                                "markeredgecolor": "k",
-                               "marker": ".",
+                               "marker": mean_type,
                                "markersize": 4},
                     medianprops={'visible': False},
                     whiskerprops={'visible': False},
@@ -171,7 +189,7 @@ def strip_plot(data, x_label, y_label, order, hue, palette, plot_name,
                     showcaps=False,
                     ax=strip)
     
-    add_legend(marker_scale=1.2)
+    add_legend(marker_scale=1.6)
     
     ax.spines[['right', 'top']].set_visible(False)
     
