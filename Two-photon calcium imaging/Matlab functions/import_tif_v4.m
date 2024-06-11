@@ -5,13 +5,11 @@ import ScanImageTiffReader.ScanImageTiffReader
 file_size = [];
 flcount = 0;
 
-
 for i = 1:31
     file_name = [dataset_name  '_' num2str(i,'%05d') '.tif'];
     fn = fullfile(file_path, file_name);
     if exist(fn,'file')
         disp(['    reading a tiff file header: ' fn]);
-
 
         flcount = flcount+1;
         file_list_to_load{flcount,1} = fn;

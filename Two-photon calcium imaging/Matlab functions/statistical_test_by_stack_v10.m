@@ -1,4 +1,4 @@
-function [frame_weight, p_values] = statistical_test_by_stack_v10(Dnum, data_compressed, total_ROI, stimuli_start_time, dataset)
+function [RF_weight, p_values] = statistical_test_by_stack_v10(Dnum, data_compressed, total_ROI, stimuli_start_time, dataset)
 
 load(['data_' dataset '.mat'])
 
@@ -9,7 +9,7 @@ color = 1;
 trials = replicates*positions*color;
 
 
-frame_weight = zeros(positions, total_ROI);
+RF_weight = zeros(positions, total_ROI);
 p_values = zeros(positions, total_ROI);
 for ROI = 1:total_ROI-1
     before_sti_mean = zeros(positions, trials);
@@ -38,7 +38,7 @@ for ROI = 1:total_ROI-1
             end
         end
         temp = mean(activity(1:replicates, 1));
-        frame_weight(pos,ROI) = temp; %blue
+        RF_weight(pos,ROI) = temp; %blue
         p_values(pos,ROI) = signrank(group1(1,:), group2(1,:));
     end
 end
