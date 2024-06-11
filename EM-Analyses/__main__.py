@@ -215,21 +215,21 @@ for i, j in zip(maps, colors):
 
 #Fig. 1di
 mt_tb_r = mapping.ConnectionMap(mt_r_general, tb_r, "AOTU_R")
-mt_tb_r.make_type_plots(plot_name = "MeTu_R to TuBu_R",
+mt_tb_r.make_type_plots(plot_name = "Fig 1/MeTu_R to TuBu_R",
                         fig_size = fig_size_mt_tb)
 
 #Fig. 1dii
 mt_tb_l = mapping.ConnectionMap(mt_l_general, tb_l, "AOTU_L")
-mt_tb_l.make_type_plots(plot_name = "MeTu_L to TuBu_L",
+mt_tb_l.make_type_plots(plot_name = "Fig 1/MeTu_L to TuBu_L",
                         fig_size = fig_size_mt_tb)
 
 #Fig. 1diii
 mt_tb_r = mapping.ConnectionMap(mt_r, tb_r, "AOTU_R") #Specific
-mt_tb_r.make_type_plots(plot_name = "Subtyped MeTu_R to TuBu_R")
+mt_tb_r.make_type_plots(plot_name = "Fig 1/Subtyped MeTu_R to TuBu_R")
 
 #Fig. 1div
 mt_tb_l = mapping.ConnectionMap(mt_l, tb_l, "AOTU_L") #Specific
-mt_tb_l.make_type_plots(plot_name = "Subtyped MeTu_L to TuBu_L")
+mt_tb_l.make_type_plots(plot_name = "Fig 1/Subtyped MeTu_L to TuBu_L")
 
 
 ---------
