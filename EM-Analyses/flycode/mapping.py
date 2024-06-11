@@ -602,7 +602,7 @@ class ConnectionMap:
         post_type_header = np.array([self.post_types], dtype="U50")
         
         absolute_path = os.path.dirname(__file__)
-        relative_path = os.path.join("Excel Plots", f"{file_name}.xlsx")
+        relative_path = os.path.join("Excel-Plots", f"{file_name}.xlsx")
         file_path = os.path.join(absolute_path, relative_path)
         sheet_dict = {"Connections": self.syn_map, 
                       "Weights": self.weight_map, 

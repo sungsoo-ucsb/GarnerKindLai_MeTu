@@ -56,7 +56,7 @@ def get_figure_path(figure_name, file_type=FileType.PDF):
         extension = "png"
     elif file_type==FileType.SVG:
         extension = "svg"
-    relative_path = f"Generated Figures/{figure_name}.{extension}"
+    relative_path = f"Generated-Figures/{figure_name}.{extension}"
     return os.path.join(absolute_path, relative_path)
 
 

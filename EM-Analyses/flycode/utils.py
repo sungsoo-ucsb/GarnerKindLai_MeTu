@@ -245,7 +245,7 @@ def basemodel_list_to_df(basemodels):
     
 
 def write_excel(df, file_name):
-    """Writes a dataframe to excel in the Excel Plots folder.
+    """Writes a dataframe to excel in the Excel-Plots folder.
     
     Parameters
     ----------
@@ -255,7 +255,7 @@ def write_excel(df, file_name):
         The name of the file.
     """
     absolute_path = os.path.dirname(__file__)
-    relative_path = os.path.join("Excel Plots", f"{file_name}.xlsx")
+    relative_path = os.path.join("Excel-Plots", f"{file_name}.xlsx")
     file_path = os.path.join(absolute_path, relative_path)
     df.to_excel(file_path)
     
@@ -319,7 +319,7 @@ def make_importable_syn_coords(syn_df, pre_or_post="pre",
 def importable_coords(coords, file_name="Importable Coordinates",
                       save_file=True):
     """Makes a csv file that can be imported into Flywire as annotations.
-        Stores it in the Importable Coords folder.
+        Stores it in the Importable-Coords folder.
 
     Parameters
     ----------
@@ -344,7 +344,7 @@ def importable_coords(coords, file_name="Importable Coordinates",
         "ID": empty_arr}
     coord_df = pd.DataFrame(coord_dict)
     absolute_path = os.path.dirname(__file__)
-    relative_path = os.path.join("Importable Coords", f"{file_name}.csv")
+    relative_path = os.path.join("Importable-Coords", f"{file_name}.csv")
     file_path = os.path.join(absolute_path, relative_path)
     coord_df.to_csv(file_path, index=False)
     return coord_df
@@ -352,7 +352,7 @@ def importable_coords(coords, file_name="Importable Coordinates",
 
 def importable_coord_lines(coords1, coords2, file_name="Importable Lines"):
     """Makes a csv file that can be imported into Flywire as annotation lines.
-        Stores it in the Importable Coords folder.
+        Stores it in the Importable-Coords folder.
 
     Parameters
     ----------
@@ -377,7 +377,7 @@ def importable_coord_lines(coords1, coords2, file_name="Importable Lines"):
         "ID": empty_arr}
     coord_df = pd.DataFrame(coord_dict)
     absolute_path = os.path.dirname(__file__)
-    relative_path = f"Importable Coords/{file_name}.csv"
+    relative_path = f"Importable-Coords/{file_name}.csv"
     file_path = os.path.join(absolute_path, relative_path)
     coord_df.to_csv(file_path, index=False)
 
