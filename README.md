@@ -9,7 +9,7 @@ All EM analyses were performed in MacOS using R and Python. All calcium imaging 
 ## Required packages
 
 ### R
-Natverse	https://natverse.org	DOI: 10.7554/eLife.53350	collection of R packages for neuroanatomical analysis
+Natverse	https://natverse.org
 
 Tidyverse	https://www.tidyverse.org/
 
