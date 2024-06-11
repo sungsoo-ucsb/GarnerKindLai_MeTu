@@ -78,7 +78,7 @@ Two-photon calcium imaging: Run plot_script files in each of the figure folder t
 
 Users must have a FlyWire account and an API token to run EM analyses code. Visit https://flywire.ai for more details.
 
-
+Some analysis code requires large spreadsheet files (cannot be uploaded to GitHub because of their size) to proceed. The final versions of those files will be available in DRYAD by the time of publication and linked to this page.
 
 
 
