@@ -532,6 +532,81 @@ def make_bihem_pie_charts(plot_folder=""):
                          transparent=True)
                                           
  
+def get_bihem_weights(min_weight=0.05):
+    """Gets the average ipsilateral and contralateral connection weight between
+    bihemispheric neurons and MeTu and TuBu neurons in the AOTU.
+
+    Parameters
+    ----------
+    min_weight : float, optional
+        The lowest value that will be included in the returned dictionary. 
+        The default is 0.05.
+
+    Returns
+    -------
+    weight_dict : dict
+        The weights of connections between neurons in the AOTU.
+    """
+    bihem_types = ["AOTU046", "TuTuB_a", "TuTuB_b"]
+    
+    mt_tb_types = [f"MeTu{x}" for x in ["1","2a","2b","3a","3b",
+                                        "3c","4a","4b","4c","4d"]] + \
+                  [f"TuBu{x}" for x in [f"0{y!s}" if y<10 else str(y) \
+                                        for y in range(1,11)]]
+    ipsi_dict = {}
+    for i in "LR":
+        temp_types = [f"{x}_{i}" for x in bihem_types] + [f"{x}_{i}" for x in mt_tb_types]
+        ipsi_dict[i] = mapping.ConnectionMap(pre_types=temp_types,
+                                             post_types=temp_types,
+                                             region=f"AOTU_{i}")
+    contra_dict = {}
+    for i in "LR":
+        opposite = "L" if i=="R" else "R"
+        temp_types = [f"{x}_{opposite}" for x in bihem_types] + [f"{x}_{i}" for x in mt_tb_types]
+        contra_dict[i] = mapping.ConnectionMap(pre_types=temp_types,
+                                               post_types=temp_types,
+                                               region=f"AOTU_{i}")
+    ipsi_weights = (ipsi_dict["L"].type_weight_map + ipsi_dict["R"].type_weight_map) / 2
+    contra_weights = (contra_dict["L"].type_weight_map + contra_dict["R"].type_weight_map) / 2
+    all_types = bihem_types + mt_tb_types
+    weight_dict = {}
+    for indi, i in enumerate(all_types):
+        for indj, j in enumerate(all_types):
+            if indi > 2 and indj > 2:
+                break
+            temp_ipsi = ipsi_weights[indi][indj]
+            temp_contra = contra_weights[indi][indj]
+            if temp_ipsi >= min_weight:
+                weight_dict[f"Ipsi {i} to {j}"] = temp_ipsi
+            if temp_contra >= min_weight:
+                weight_dict[f"Contra {i} to {j}"] = temp_contra
+    return weight_dict
+            
+
+def get_bihem_weight_line_width(min_weight=0.05):
+    """Gets the line width of arrows for the bihemispheric weight figure, using
+    the formula y=2.5x+0.455.
+
+    Parameters
+    ----------
+    min_weight : min_weight, optional
+        The lowest value that will be queried in get_bihem_weights(). 
+        The default is 0.05.
+
+    Returns
+    -------
+    line_dict : dict
+        The width of each line between neuron types.
+    """
+    weight_dict = get_bihem_weights(min_weight=min_weight)
+    line_dict = {}
+    for i in weight_dict:
+        thickness = 2.5*weight_dict[i] + 0.455
+        line_dict[i] = round(thickness, 1)
+    return line_dict
+
+
+
 
 
 

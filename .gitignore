@@ -164,6 +164,9 @@ cython_debug/
 # Generated Figures
 EM-Analyses/Python/flycode/Generated-Figures/
 
+# Generated Excel Files
+EM-Analyses/Python/flycode/Excel-Plots/
+
 # Spreadsheet from Codex
 EM-Analyses/Python/flycode/Readable/Codex Labels 783.csv
 #Full synapse spreadsheet

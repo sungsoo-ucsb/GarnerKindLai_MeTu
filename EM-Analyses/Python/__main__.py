@@ -368,6 +368,11 @@ tb_er_pl_l.make_connectivity_plots(plot_name="TuBu_PL_L to ER_PL_L",
 # --------- #
 plot_folder = "Fig S6"
 
+#Fig. S6a
+line_widths = specific.get_bihem_weight_line_width()
+for i in line_widths:
+    print(i, line_widths[i])
+
 #Fig. S6b, S6di-ii
 specific.make_bihem_pie_charts(plot_folder=plot_folder)
 
