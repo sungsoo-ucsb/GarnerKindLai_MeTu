@@ -674,14 +674,14 @@ for i in ["Medulla Postsynapse Count", "AOTU Postsynapse Count",
 plot_folder = "Fig S14"
 
 #Fig. S14a-j
-comparison.nt_by_types(
-    [f"{x}_R" for x in comparison.colors], 
-    palette=list(comparison.colors.values()), 
-    plot_names=[f"{x} Neurotransmitter Prediction" for x in comparison.colors.keys()],
-    plot_folder=plot_folder,
-    save_figure=True,
-    fig_size=(1,0.75), 
-    separate_plots=True)
+metu_nts = comparison.nt_by_types(\
+        [f"{x}_R" for x in comparison.colors], 
+        palette=list(comparison.colors.values()), 
+        plot_names=[f"{x} Neurotransmitter Prediction" for x in comparison.colors.keys()],
+        plot_folder=plot_folder,
+        save_figure=True,
+        fig_size=(1,0.75), 
+        separate_plots=True)
 
 
 # ---------- #

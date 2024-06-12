@@ -37,14 +37,16 @@ def import_file(file_name, sheet_name=0, usecols=None,
         The file as a pandas DataFrame.
     """
     absolute_path = os.path.dirname(__file__)
-    relative_path = f"Readable/{file_name}.{file_type}"
-    file_path = os.path.join(absolute_path, relative_path)
+    relative_path = f"{file_name}.{file_type}"
+    file_path = os.path.join(absolute_path, "Readable", relative_path)
     
     if file_type == "xlsx":
         file = pd.read_excel(file_path, sheet_name = sheet_name, 
                              usecols = usecols, dtype=dtype)
-    else:
+    elif file_type == "csv":
         file = pd.read_csv(file_path, dtype=dtype)
+    elif file_type == "feather":
+        file = pd.read_feather(file_path)
     return file
 
 

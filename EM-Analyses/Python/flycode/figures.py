@@ -117,6 +117,7 @@ def save_fig(fig, plot_name, folder_path=[], file_type=FileType.PDF, dpi=300,
                 dpi=dpi, 
                 bbox_inches='tight', 
                 transparent=transparent)
+    print(f"Figure saved at {file_path}")
 
 
 def add_legend(legend=None, marker_scale=1.2):
