@@ -248,13 +248,15 @@ def compare_f1_scores():
     return node_f1_scores, syn_f1_scores
 
 
-def plot_f1(f1_scores):
+def plot_f1(f1_scores, plot_folder=""):
     """Plots the node and synapse F1 score charts.
 
     Parameters
     ----------
     f1_scores : tuple
         Items given by compare_f1_scores().
+    plot_folder : str
+        The folder to save the plots.
     """
     font_size = 6
     width_prop = {'linewidth': 0.3}
@@ -291,8 +293,7 @@ def plot_f1(f1_scores):
         plt.yticks(ticks=y_labels, 
                    labels=y_labels, 
                    fontsize=font_size)
-        figures.save_fig(fig,
-                         f"Fig S1/{y_label}")
+        figures.save_fig(fig, plot_name=y_label, folder_path=[plot_folder])
         plt.show()
 
 

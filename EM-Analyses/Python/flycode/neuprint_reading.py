@@ -198,7 +198,7 @@ def hemi_syn_counts(types, region, outliers=[], y_axis="Synapse Count"):
     return neur_dict
 
 
-def lobula_counts(just_metu4, plot_name="", save_figure=True):
+def lobula_counts(just_metu4, plot_name="", plot_folder="", save_figure=True):
     """Makes a dataframe with the lobula counts of all MeTu4 neurons or all
         MeTu neurons.
     
@@ -208,6 +208,8 @@ def lobula_counts(just_metu4, plot_name="", save_figure=True):
         Whether the figure will only conatin MeTu4 or all MeTu in Neuprint.
     plot_name : str, optional
         The name of the outputted plot. The default is "".
+    plot_folder : str, optional
+        The name of the folder to save the plots to. The default is "".
     save_figure : bool, optional
         Whether the figure will be saved. The default is True.
         
@@ -259,14 +261,15 @@ def lobula_counts(just_metu4, plot_name="", save_figure=True):
                        order=neur_types, 
                        hue="Synapse Type", 
                        plot_name=plot_name,
+                       folder_path=plot_folder,
                        palette=["#FF0000", "#00FFFF"],
                        save_figure=save_figure)
     return df
 
 
 
-def ratio_plot(ratio_type, plot_name, save_figure=True, fig_size=(2.5,1.25),
-               y_ticks=np.arange(0,4,1)):
+def ratio_plot(ratio_type, plot_name, plot_folder="", save_figure=True,
+               fig_size=(2.5,1.25), y_ticks=np.arange(0,4,1)):
     """
     Plots ratios between two sets of neurons.
 
@@ -276,6 +279,8 @@ def ratio_plot(ratio_type, plot_name, save_figure=True, fig_size=(2.5,1.25),
         One of the ratios in the enum Ratio.
     plot_name : str
         Name of the plot.
+    plot_folder : str, optional
+        The name of the folder to save the plots to. The default is "".
     save_figure : bool, optional
         Whether to save the figure. The default is True.
     fig_size : tuple, optional
@@ -321,6 +326,7 @@ def ratio_plot(ratio_type, plot_name, save_figure=True, fig_size=(2.5,1.25),
                            colors=["#1f77b4","#d62728","#2ca02c"],
                            fig_size=fig_size,
                            plot_name=plot_name,
+                           folder_path=[plot_folder],
                            save_figure=save_figure)
     
     return ratio_dict
@@ -328,7 +334,7 @@ def ratio_plot(ratio_type, plot_name, save_figure=True, fig_size=(2.5,1.25),
 
 
 def plot_comparison(compare_types, datasets={"FAFB": "LR", "Hemibrain": "R"},
-                    plot_name="Neuron Counts", 
+                    plot_name="Neuron Counts", plot_folder="",
                     y_ticks=np.arange(0,3,1),
                     save_figure=True, fig_size=(2.0,1.25)):
     """Compares a type between hemispheres and datasets.
@@ -342,6 +348,8 @@ def plot_comparison(compare_types, datasets={"FAFB": "LR", "Hemibrain": "R"},
         a string ("LR", "L", or "R").
     plot_name : str, optional
         The name of the outputted plot. The default is "Neuron Counts".
+    plot_folder : str, optional
+        The name of the folder to save the plots to. The default is "".
     save_figure : bool, optional
         Whether the figure will be saved. The default is True.
     fig_size : tuple, optional
@@ -383,6 +391,7 @@ def plot_comparison(compare_types, datasets={"FAFB": "LR", "Hemibrain": "R"},
                            colors=colors,
                            fig_size=fig_size,
                            plot_name=plot_name,
+                           folder_path=[plot_folder],
                            save_figure=save_figure)
     
     return neuron_counts

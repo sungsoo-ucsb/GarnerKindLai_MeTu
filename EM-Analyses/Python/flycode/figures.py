@@ -34,13 +34,42 @@ class FileType(Enum):
     SVG = 3
 
 
-def get_figure_path(figure_name, file_type=FileType.PDF):
+def verify_folder_path(folder_path):
+    """Creates a directory in the order of the passed list.
+    
+    Parameters
+    ----------
+    folder_path : list-like[str]
+        A list of directory names. If they do not exist, they will be created.
+        
+    Returns
+    -------
+    directory : str
+        The resulting directory based on the given folder_path.
+    """
+    directory = os.path.dirname(__file__)
+    directory = os.path.join(directory, "Generated-Figures")
+    if isinstance(folder_path, str):
+        folder_path = [folder_path]
+    for i in folder_path:
+        if i == "":
+            continue
+        subfolders = [x.path for x in os.scandir(directory) if x.is_dir()]
+        directory = os.path.join(directory, i)
+        if not directory in subfolders:
+            os.mkdir(directory)
+    return directory
+
+
+def get_figure_path(figure_name, folder_path=[], file_type=FileType.PDF):
     """Makes an exportable figure path, depending on the file type.
     
     Parameters
     ----------
     figure_name : str
         The name of the figure.
+    folder_path : list-like, optional
+        The folder path the figure will be saved to. The default is [].
     file_type : int, optional
         One of the values of the FileType enum. The default is FileType.PDF.
     
@@ -49,18 +78,18 @@ def get_figure_path(figure_name, file_type=FileType.PDF):
     str
         file_path to save the figure to.
     """
-    absolute_path = os.path.dirname(__file__)
+    absolute_path = verify_folder_path(folder_path)
     if file_type==FileType.PDF:
         extension = "pdf"
     elif file_type==FileType.PNG:
         extension = "png"
     elif file_type==FileType.SVG:
         extension = "svg"
-    relative_path = f"Generated-Figures/{figure_name}.{extension}"
-    return os.path.join(absolute_path, relative_path)
+    figure_name = f"{figure_name}.{extension}"
+    return os.path.join(absolute_path, figure_name)
 
 
-def save_fig(fig, plot_name, dpi=300, file_type=FileType.PDF, 
+def save_fig(fig, plot_name, folder_path=[], file_type=FileType.PDF, dpi=300, 
              transparent=False):
     """Saves a figure with the given file path.
     
@@ -70,15 +99,20 @@ def save_fig(fig, plot_name, dpi=300, file_type=FileType.PDF,
         The figure to be saved.
     plot_name : str
         The name of the file upon being exported.
-    dpi : int, optional
-        The dpi. The default is 300.
+    folder_path : list-like, optional
+        The folder path the figure will be saved to. The default is [].
     file_type : int, optional
         One of the values of the FileType enum. The default is FileType.PDF.
+    dpi : int, optional
+        The dpi. The default is 300.
+        folder_path : list-like, optional
+            The folder path the figure will go into.
     transparent : bool, optional
         Whether to export the file with a transparent background. The default
         is False.
     """
-    file_path = get_figure_path(plot_name, file_type=file_type)
+    file_path = get_figure_path(plot_name, folder_path=folder_path, 
+                                file_type=file_type)
     fig.savefig(file_path, 
                 dpi=dpi, 
                 bbox_inches='tight', 
@@ -114,7 +148,7 @@ def add_legend(legend=None, marker_scale=1.2):
 
 
 def strip_plot(data, x_label, y_label, order, hue, palette, plot_name, 
-              dodge=True, save_figure=True, fig_size=(2.0, 1.25),
+               folder_path=[], dodge=True, save_figure=True, fig_size=(2.0, 1.25),
               show_means=False, mean_type=".", size=2.5, lim_range=None):
     """Makes a strip plot.
 
@@ -134,6 +168,8 @@ def strip_plot(data, x_label, y_label, order, hue, palette, plot_name,
         The colors.
     plot_name : str
         The name of the plot to be exported.
+    folder_path : list-like, optional
+        The folder path the figure will be saved to. The default is [].
     dodge : bool, optional
         Whether the hue strips are separated. The default is True.
     save_figure : bool, optional
@@ -194,11 +230,12 @@ def strip_plot(data, x_label, y_label, order, hue, palette, plot_name,
     ax.spines[['right', 'top']].set_visible(False)
     
     if save_figure:
-        save_fig(fig, plot_name=plot_name)
+        save_fig(fig, plot_name=plot_name, folder_path=folder_path)
 
 
 def create_bar_graph(data, x_label, y_label, x_ticks, y_ticks, colors,
-                     fig_size, plot_name, save_figure, color_axis=0):
+                     fig_size, plot_name, save_figure, folder_path=[],
+                     color_axis=0):
     """Takes in bar graph data and makes a graph.
 
     Parameters
@@ -223,6 +260,8 @@ def create_bar_graph(data, x_label, y_label, x_ticks, y_ticks, colors,
         The name of the outputted plot.
     save_figure : bool
         Whether to save the figure.
+    folder_path : list-like, optional
+        The folder path the figure will be saved to. The default is [].
     color_axis : int, optional
         Along what axis the color scheme occurs. The default is 0.
     """
@@ -262,7 +301,7 @@ def create_bar_graph(data, x_label, y_label, x_ticks, y_ticks, colors,
     add_legend()
     
     if save_figure:
-        save_fig(fig, plot_name=plot_name)
+        save_fig(fig, plot_name=plot_name, folder_path=folder_path)
 
 
 

@@ -436,8 +436,9 @@ class ConnectionMap:
             label_position = np.append(label_position, starting_point)
         return label_position
                 
-    def plot_connectivity(self, conn_map, plot_name="", cmap_color="Purples",
-                          fig_size=(1.5,1.5), save_figure=True):
+    def plot_connectivity(self, conn_map, plot_name="", plot_folder="",
+                          cmap_color="Purples", fig_size=(1.5,1.5), 
+                          save_figure=True):
         """Makes a connectivity matrix that can be exported.
 
         Parameters
@@ -446,6 +447,8 @@ class ConnectionMap:
             The map to plot.
         plot_name : str, optional
             The plot name to save. The default is "".
+        plot_folder : str, optional
+            The folder to save the figures to. The default is "".
         cmap_color : matplotlib.colors.ListerColormap, optional
             The color scheme of the matrix plot. The default is "Purples".
         fig_size : tuple, optional
@@ -486,10 +489,10 @@ class ConnectionMap:
         ax.tick_params(which="both", bottom=False, left=False)
         
         if save_figure:
-            figures.save_fig(fig, plot_name=plot_name)
+            figures.save_fig(fig, plot_name=plot_name, folder_path=[plot_folder])
         return fig
     
-    def plot_type_connectivity(self, type_map, plot_name="", 
+    def plot_type_connectivity(self, type_map, plot_name="", plot_folder="",
                                cmap_color=new_colors["Green"],
                                fig_size=(1.5,1.5), save_figure=True):
         """Makes a neuron type connectivity matrix that can be exported.
@@ -500,6 +503,8 @@ class ConnectionMap:
             The map to plot.
         plot_name : str, optional
             The plot name to save. The default is "".
+        plot_folder : str, optional
+            The folder to save the figures to. The default is "".
         cmap_color : matplotlib.colors.ListerColormap, optional
             The color scheme of the matrix plot. The default is 
             new_colors["Green"].
@@ -542,45 +547,54 @@ class ConnectionMap:
         ax.tick_params(which="both", bottom=False, left=False)
         
         if save_figure:
-            figures.save_fig(fig, plot_name=plot_name)
+            figures.save_fig(fig, plot_name=plot_name, folder_path=[plot_folder])
         return fig
     
-    def make_connectivity_plots(self, plot_name="", fig_size=(1.5,1.5)):
+    def make_connectivity_plots(self, plot_name="", plot_folder="", fig_size=(1.5,1.5)):
         """Plots the connectivity matrices.
 
         Parameters
         ----------
         plot_name : str, optional
             The plot name to save. The default is "".
+        plot_folder : str, optional
+            The folder to save the figures to. The default is "".
         fig_size : tuple, optional
             The size of the figure. The default is (1.5,1.5).
         """
         self.plot_connectivity(self.syn_map, \
                         plot_name=f"{plot_name} Synaptic Connections",
+                        plot_folder=plot_folder,
                         cmap_color=new_colors["Orange"],
                         fig_size=fig_size, save_figure=False)
         self.plot_connectivity(self.weight_map, \
                         plot_name=f"{plot_name} Synaptic Weights",
+                        plot_folder=plot_folder,
                         fig_size=fig_size, save_figure=False)
         self.plot_connectivity(self.weight_map_min_3, \
                         plot_name=f"{plot_name} Synaptic Weights Min 3",
+                        plot_folder=plot_folder,
                         fig_size=fig_size, save_figure=True)
     
-    def make_type_plots(self, plot_name="", fig_size=(1.5,1.5)): 
+    def make_type_plots(self, plot_name="", plot_folder="", fig_size=(1.5,1.5)): 
         """Plots the neuron type connectivity matrices.
 
         Parameters
         ----------
         plot_name : str, optional
             The plot name to save. The default is "".
+        plot_folder : str, optional
+            The folder to save the figures to. The default is "".
         fig_size : tuple, optional
             The size of the figure. The default is (1.5,1.5).
         """
         self.plot_type_connectivity(self.type_map, \
                         plot_name=f"{plot_name} Type Connections",
+                        plot_folder=plot_folder,
                         fig_size=fig_size, save_figure=False)
         self.plot_type_connectivity(self.type_weight_map, \
                         plot_name=f"{plot_name} Type Weights",
+                        plot_folder=plot_folder,
                         fig_size=fig_size)
     
     def to_excel(self, file_name):

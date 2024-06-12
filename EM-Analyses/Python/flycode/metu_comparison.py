@@ -65,7 +65,7 @@ adjusted_name = {
     }
 
 
-def compare_metu(column, save_figure=True):
+def compare_metu(column, save_figure=True, plot_folder=""):
     """Makes a strip plot comparing all MeTu subtypes based on their values
         in a column within dv_table.
 
@@ -75,50 +75,23 @@ def compare_metu(column, save_figure=True):
         The column in dv_table.
     save_fig : bool, optional
         Whether to save the figure. The default is True.
-    """
-    plot_name = f"Fig S6/Comparison/{column}"
-    figures.strip_plot(data=dv_table, x_label="MeTu Subtype", y_label=column,
-                    order=colors.keys(), hue="MeTu Subtype",
-                    palette=colors.values(),
-                    plot_name=plot_name, save_figure=save_figure,
-                    dodge=False, show_means=True)
-    
-    
-def single_fig(df, x, y, neur_type, plot_folder):
-    """Makes an individual scatter plot based on dv_table limited to a specific
-        MeTu subtype.
-
-    Parameters
-    ----------
-    df : pd.DataFrame
-        DESCRIPTION.
-    x : str
-        The column in dv_table to be plotted on the x-axis.
-    y : str
-        The column in dv_table to be plotted on the y-axis.
-    neur_type : str
-        The MeTu type the plot is regarding.
     plot_folder : str, optional
-        The folder within MeTu Comparison in which to put the plots. 
-        The default is "".
+        The folder to save the plots to. The default is "".
     """
-    fig, ax = plt.subplots(figsize=(0.75,0.75))
-    a, b = np.polyfit(df[x], df[y], 1)
-    ax.scatter(x=df[x], y=df[y],
-                s=dot_size, c=colors[neur_type])
-    ax.plot(df[x], a*df[x]+b, c=colors[neur_type])
-    plt.xlim(spacing[x][0], spacing[x][1])
-    plt.ylim(spacing[y][0], spacing[y][1])
-    
-    x_label = adjusted_name[x] if x in adjusted_name else x
-    plt.xlabel(x_label, fontsize=font_size)
-    plt.ylabel(y, fontsize=font_size)
-    plt.xticks(fontsize=font_size)
-    plt.yticks(fontsize=font_size)
-    figures.save_fig(fig, f"MeTu Comparison/{plot_folder}{neur_type}")
+    figures.strip_plot(data=dv_table, 
+                       x_label="MeTu Subtype", 
+                       y_label=column,
+                       order=colors.keys(), 
+                       hue="MeTu Subtype",
+                       palette=colors.values(),
+                       plot_name=column, 
+                       folder_path=[plot_folder, "Comparison"], 
+                       save_figure=save_figure,
+                       dodge=False, 
+                       show_means=True)
 
 
-def scatter_plots(x, y, plot_folder="", save_figure=True):
+def scatter_plots(x, y, plot_name="", plot_folder="", save_figure=True):
     """Makes scatter plots comparing two columns of dv_table for each MeTu
         subtype, as well as a plot with all subtypes together and their
         line of best fits together as two different subplots.
@@ -129,9 +102,10 @@ def scatter_plots(x, y, plot_folder="", save_figure=True):
         The column in dv_table to be plotted on the x-axis.
     y : str
         The column in dv_table to be plotted on the y-axis.
+    plot_name : str, optional
+        The name of the saved figure. The default is "".
     plot_folder : str, optional
-        The folder within MeTu Comparison in which to put the plots. 
-        The default is "".
+        The folder which the plots get save to. The default is "".
     save_figure : bool, optional
         Whether to save the figure as a file. The default is True.
     """
@@ -157,12 +131,13 @@ def scatter_plots(x, y, plot_folder="", save_figure=True):
     fig.tight_layout()
     if not save_figure:
         return
-    figures.save_fig(fig, f"Fig S6/Scatter/{plot_folder.strip('/')}")
+    folder_path = [plot_folder, "Scatter"]
+    figures.save_fig(fig, plot_name=plot_name, folder_path=folder_path)
 
 
 
-def nt_by_types(neur_types, plot_names=["NTs"], region="Connectome", 
-                palette=["#000000"], save_figure=True,
+def nt_by_types(neur_types, plot_names=["NTs"], plot_folder="",
+                region="Connectome", palette=["#000000"], save_figure=True,
                 fig_size=(1.6,1.25), separate_plots=False):
     """Makes a plot of the neurotransmitters for the neuron types.
 
@@ -172,6 +147,8 @@ def nt_by_types(neur_types, plot_names=["NTs"], region="Connectome",
         Neuron types in Neuron Spreadsheet.
     plot_names : str, optional
         What to name the plot. The default is "NTs".
+    plot_folder : str, optional
+        The name of the folder to save the plots to. The default is "".
     region : str, optional
         The region by which to limit the NT probabilities. 
         The default is "Connectome".
@@ -227,6 +204,7 @@ def nt_by_types(neur_types, plot_names=["NTs"], region="Connectome",
                            hue="Subtype",
                            palette=temp_palette,
                            plot_name=f"{plot_names[indi]}",
+                           folder_path=[plot_folder],
                            dodge=False,
                            fig_size=fig_size,
                            size=2,
@@ -259,13 +237,15 @@ def get_mt4e():
     return types
 
 
-def mt4e_partner_comparison(plot_name, save_figure=False):
+def mt4e_partner_comparison(plot_name, plot_folder="", save_figure=False):
     """Makes a graph comparing putative MeTu4e partners to other MeTu4a.
 
     Parameters
     ----------
     plot_name : str
         The name of the exported plot.
+    plot_folder : str, optional
+        The name of the folder to save the plots to. The default is "".
     save_figure : bool, optional
         Whether to save the figure. The default is False.
 
@@ -323,6 +303,7 @@ def mt4e_partner_comparison(plot_name, save_figure=False):
                            order=[x.split("-")[0] for x in partner_types \
                                           if x[-1]==end_letter], 
                            plot_name=f"{plot_name} MeTu4 are {i}",
+                           folder_path=[plot_folder, "MeTu4e"],
                            palette=["#D62728", "#1F77B4"],
                            dodge=True,
                            save_figure=save_figure,
@@ -330,7 +311,7 @@ def mt4e_partner_comparison(plot_name, save_figure=False):
     return df
 
 
-def mt4e_dorsal_comparison(plot_name, save_figure=True):
+def mt4e_dorsal_comparison(plot_name, plot_folder="", save_figure=True):
     """Makes a graph comparing putative MeTu4e to other MeTu4a by medulla
     position along the D-V axis.
 
@@ -338,6 +319,8 @@ def mt4e_dorsal_comparison(plot_name, save_figure=True):
     ----------
     plot_name : str
         The name of the exported plot.
+    plot_folder : str, optional
+        The name of the folder to save the plots to. The default is "".
     save_figure : bool, optional
         Whether to save the figure. The default is False.
 
@@ -384,6 +367,7 @@ def mt4e_dorsal_comparison(plot_name, save_figure=True):
                          hue="Putative Type",
                          order=["Other MeTu4a", "Putative MeTu4e"],
                          plot_name=f"{plot_name} {i}",
+                         folder_path=[plot_folder, "MeTu4e"],
                          palette=["#D62728", "#1F77B4"],
                          save_figure=save_figure,
                          dodge=False,

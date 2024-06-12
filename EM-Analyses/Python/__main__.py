@@ -200,12 +200,25 @@ regions = {"AME_L": 1, "LO_L": 2, "NO": 3, "BU_L": 4, "PB": 5, "LH_L": 6,
 for i in regions.copy():
     regions[regions[i]] = i
 
+plot_folder = ""
+directory = os.path.dirname(__file__)
+directory = os.path.join(directory, "flycode")
+for i in ["Excel-Plots", "Generated-Figures", "Importable-Coords",
+          "Meshes", "Readable"]:
+    subfolders = [x.path for x in os.scandir(directory) if x.is_dir()]
+    temp_directory = os.path.join(directory, i)
+    if not temp_directory in subfolders:
+        os.mkdir(temp_directory)
+
+
 
 
 """
---------
-Figure 1
---------
+# -------- #
+# Figure 1 #
+# -------- #
+plot_folder = "Fig 1"
+
 #Fig. 1c
 colors = ["TPurple", "TPurple", "TBlue", "TRed", "TGreen", "TOrange2", 
           "TOrange2", "TRed", "TGreen", "TPink"]
@@ -215,365 +228,435 @@ for i, j in zip(maps, colors):
 
 #Fig. 1di
 mt_tb_r = mapping.ConnectionMap(mt_r_general, tb_r, "AOTU_R")
-mt_tb_r.make_type_plots(plot_name = "Fig 1/MeTu_R to TuBu_R",
-                        fig_size = fig_size_mt_tb)
+mt_tb_r.make_type_plots(plot_name = "MeTu_R to TuBu_R", 
+                        plot_folder=plot_folder, fig_size=fig_size_mt_tb)
 
 #Fig. 1dii
 mt_tb_l = mapping.ConnectionMap(mt_l_general, tb_l, "AOTU_L")
-mt_tb_l.make_type_plots(plot_name = "Fig 1/MeTu_L to TuBu_L",
-                        fig_size = fig_size_mt_tb)
+mt_tb_l.make_type_plots(plot_name = "MeTu_L to TuBu_L",
+                        plot_folder=plot_folder, fig_size=fig_size_mt_tb)
 
 #Fig. 1diii
 mt_tb_r = mapping.ConnectionMap(mt_r, tb_r, "AOTU_R") #Specific
-mt_tb_r.make_type_plots(plot_name = "Fig 1/Subtyped MeTu_R to TuBu_R")
+mt_tb_r.make_type_plots(plot_name="Subtyped MeTu_R to TuBu_R",
+                        plot_folder=plot_folder)
 
 #Fig. 1div
 mt_tb_l = mapping.ConnectionMap(mt_l, tb_l, "AOTU_L") #Specific
-mt_tb_l.make_type_plots(plot_name = "Fig 1/Subtyped MeTu_L to TuBu_L")
+mt_tb_l.make_type_plots(plot_name="Subtyped MeTu_L to TuBu_L",
+                        plot_folder=plot_folder)
 
 
----------
-Figure S1
----------
+# --------- #
+# Figure S1 #
+# --------- #
+plot_folder = "Fig S1"
+
 #Fig. S1biii and S1biv
 f1_scores = volumes.compare_f1_scores()
-volumes.plot_f1(f1_scores)
+volumes.plot_f1(f1_scores, plot_folder=plot_folder)
 volumes.get_all_t_tests(f1_scores) #Gets t-test p-scores.
 
 
----------
-Figure S2
----------
+# --------- #
+# Figure S2 #
+# --------- #
 #Figure this one out
 
 
----------
-Figure S3
----------
+# --------- #
+# Figure S3 #
+# --------- #
+plot_folder = "Fig S3"
+
 #Fig. S3a
 bihem_aotu_r = mapping.ConnectionMap(aotu46+tutu+mt_r, aotu46+tutu+mt_r+tb_r, "AOTU_R")
 bihem_aotu_r.make_type_plots(\
-            plot_name="Bihemispheric Connections (AOTU_R)",
+            plot_name="Bihemispheric Connections (AOTU_R)", plot_folder=plot_folder,
             fig_size=bihem_size)
 
 #Fig. S3b
 bihem_aotu_l = mapping.ConnectionMap(aotu46+tutu+mt_l, aotu46+tutu+mt_l+tb_l, "AOTU_L")
 bihem_aotu_l.make_type_plots(\
-            plot_name="Bihemispheric Connections (AOTU_L)",
+            plot_name="Bihemispheric Connections (AOTU_L)", plot_folder=plot_folder,
             fig_size=bihem_size)
 
 #Fig. S3c
 bihem_bu_r = mapping.ConnectionMap(aotu46+tb_r, aotu46+tb_r+er_r, "BU_R")
 bihem_bu_r.make_type_plots(\
-            plot_name="Bihemispheric Connections (BU_R)",
+            plot_name="Bihemispheric Connections (BU_R)", plot_folder=plot_folder,
             fig_size=bihem_size)
 
 #Fig. S3d
 bihem_bu_l = mapping.ConnectionMap(aotu46+tb_l, aotu46+tb_l+er_l, "BU_L")
 bihem_bu_l.make_type_plots(\
-            plot_name="Bihemispheric Connections (BU_L)",
+            plot_name="Bihemispheric Connections (BU_L)", plot_folder=plot_folder,
             fig_size=bihem_size)
 
 
----------
-Figure S4
----------
+# --------- #
+# Figure S4 #
+# --------- #
+plot_folder = "Fig S4"
+
 #Fig. S4
 eb_inter = mapping.ConnectionMap(er_all_plus_lal+exr+eb_broad, 
                                  er_all_plus_lal+exr+eb_broad, "EB")
-eb_inter.make_type_plots(plot_name = "EB Interconnectivity",
-                         fig_size = (8, 8))
+eb_inter.make_type_plots(plot_name="EB Interconnectivity",
+                         plot_folder=plot_folder, fig_size=(8, 8))
 
 
----------
-Figure S5
----------
+# --------- #
+# Figure S5 #
+# --------- #
+plot_folder = "Fig S5"
+
 #Fig. S5ai
 mt1_r_outliers = fw.locs_to_segments(mt1_r_outlier_coords)
 mt1_r_inter_me = mapping.ConnectionMap(mt1_r, mt1_r, "ME_R", exclude=mt1_r_outliers)
 mt1_r_inter_me.make_connectivity_plots(plot_name="MT1_R Interconnectivity (ME_R)",
+                                       plot_folder=plot_folder,
                                        fig_size=fig_size_mt1)
 
 #Fig. S5aii
 mt1_l_inter_me = mapping.ConnectionMap(mt1_l, mt1_l, "ME_L")
 mt1_l_inter_me.make_connectivity_plots(plot_name="MT1_L Interconnectivity (ME_L)",
+                                       plot_folder=plot_folder,
                                        fig_size=fig_size_mt1)
 
 #Fig. S5bi
 mt1_r_outliers = fw.locs_to_segments(mt1_r_outlier_coords)
 mt1_r_inter_aotu = mapping.ConnectionMap(mt1_r, mt1_r, "AOTU_R",)
 mt1_r_inter_aotu.make_connectivity_plots(plot_name="MT1_R Interconnectivity (AOTU_R)",
+                                         plot_folder=plot_folder,
                                          fig_size=fig_size_mt1)
 
 #Fig. S5bii
 mt1_l_inter_aotu = mapping.ConnectionMap(mt1_l, mt1_l, "AOTU_L")
 mt1_l_inter_aotu.make_connectivity_plots(plot_name="MT1_L Interconnectivity (AOTU_L)",
+                                         plot_folder=plot_folder,
                                          fig_size=fig_size_mt1)
 
 #Fig. S5ci
 mt_tb_pl_r = mapping.ConnectionMap(mt1_r, tb_pl_r, "AOTU_R")
 mt_tb_pl_r.make_connectivity_plots(plot_name="MeTu1_R to TuBu_R",
+                                   plot_folder=plot_folder,
                                    fig_size=fig_size_mt_tb_pl)
 
 #Fig. S5cii
 mt_tb_pl_l = mapping.ConnectionMap(mt1_l, tb_pl_l, "AOTU_L")
 mt_tb_pl_l.make_connectivity_plots(plot_name="MeTu1_L to TuBu_L",
+                                   plot_folder=plot_folder,
                                    fig_size=fig_size_mt_tb_pl)
 
 #Fig. S5di
 tb_er_pl_r = mapping.ConnectionMap(tb_pl_r, er_pl_r, "BU_R")
 tb_er_pl_r.make_connectivity_plots(plot_name="TuBu_PL_R to ER_PL_R",
+                                   plot_folder=plot_folder,
                                    fig_size=fig_size_tb_er_pl_r)
 
 #Fig. S5dii
 fig_size_tb_er_pl_l = (1.15, 1.15)
 tb_er_pl_l = mapping.ConnectionMap(tb_pl_l, er_pl_l, "BU_L")
 tb_er_pl_l.make_connectivity_plots(plot_name="TuBu_PL_L to ER_PL_L",
+                                   plot_folder=plot_folder,
                                    fig_size=fig_size_tb_er_pl_l)
 
 
----------
-Figure S6
----------
+# --------- #
+# Figure S6 #
+# --------- #
+plot_folder = "Fig S6"
+
 #Fig. S6b, S6di-ii
-specific.make_bihem_pie_charts()
+specific.make_bihem_pie_charts(plot_folder=plot_folder)
 
 #Fig. S6c
 comparison.nt_by_types(["AOTU046_L_1", "AOTU046_L_2", "AOTU046_R_1", "AOTU046_R_2"],
         palette=["#e6194B", "#EBC400", "#3E7748", "#4400dd"],
-        plot_names=["AOTU046 NT Predictions"], fig_size=(1, 0.75))
+        plot_names=["AOTU046 NT Predictions"], plot_folder=plot_folder,
+        fig_size=(1, 0.75))
 
 #Fig. S6ei
 comparison.nt_by_types(["TuTuB_a_L", "TuTuB_a_R"], 
-                       plot_names=["TuTuB_a NT Predictions"],
+                       plot_names=["TuTuB_a NT Predictions"], 
+                       plot_folder=plot_folder,
                        palette=["#e6194B", "#3E7748"])
 
 #Fig. S6eii
 comparison.nt_by_types(["TuTuB_b_L", "TuTuB_b_R"],
-                       plot_names=["TuTuB_b NT Predictions"],
+                       plot_names=["TuTuB_b NT Predictions"], 
+                       plot_folder=plot_folder,
                        palette=["#e6194B", "#3E7748"])
 
-#Fig. S3f
-specific.tutu_comparison(plot_name="TuTu Synapse Counts Comparison")
+#Fig. S6f
+specific.tutu_comparison(plot_name="TuTu Synapse Counts Comparison", 
+                         plot_folder=plot_folder)
 
 
----------
-Figure S7
----------
+# --------- #
+# Figure S7 #
+# --------- #
+plot_folder = "Fig S7"
+
 #Fig. S7ai
 mt2_r_outliers = fw.locs_to_segments(mt2_r_outlier_coords)
 mt2_r_inter_me = mapping.ConnectionMap(mt2_r, mt2_r, "ME_R", exclude = mt2_r_outliers)
 mt2_r_inter_me.make_connectivity_plots(plot_name="MT2_R Interconnectivity (ME_R)",
+                                       plot_folder=plot_folder,
                                        fig_size=fig_size_mt2)
 
 #Fig. S7aii
 mt2_l_inter_me = mapping.ConnectionMap(mt2_l, mt2_l, "ME_L")
 mt2_l_inter_me.make_connectivity_plots(plot_name="MT2_L Interconnectivity (ME_L)",
+                                       plot_folder=plot_folder,
                                        fig_size=fig_size_mt2)
 
 #Fig. S7bi
 mt2_r_inter_aotu = mapping.ConnectionMap(mt2_r, mt2_r, "AOTU_R",)
 mt2_r_inter_aotu.make_connectivity_plots(plot_name="MT2_R Interconnectivity (AOTU_R)",
+                                         plot_folder=plot_folder,
                                          fig_size=fig_size_mt2)
 
 #Fig. S7bii
 mt2_l_inter_aotu = mapping.ConnectionMap(mt2_l, mt2_l, "AOTU_L")
 mt2_l_inter_aotu.make_connectivity_plots(plot_name="MT2_L Interconnectivity (AOTU_L)",
+                                         plot_folder=plot_folder,
                                          fig_size=fig_size_mt2)
 
 #Fig. S7ci
 mt_tb_pc_r = mapping.ConnectionMap(mt2_r, tb_pc_r, "AOTU_R")
 mt_tb_pc_r.make_connectivity_plots(plot_name="MeTu2_R to TuBu_R",
+                                   plot_folder=plot_folder,
                                    fig_size=fig_size_mt_tb_pc)
 
 #Fig. S7cii
 mt_tb_pc_l = mapping.ConnectionMap(mt2_l, tb_pc_l, "AOTU_L")
 mt_tb_pc_l.make_connectivity_plots(plot_name="MeTu2_L to TuBu_L",
+                                   plot_folder=plot_folder,
                                    fig_size=fig_size_mt_tb_pc)
 
 #Fig. S7di
 tb_er_pc_r = mapping.ConnectionMap(tb_pc_r, er_pc_r, "BU_R")
 tb_er_pc_r.make_connectivity_plots(plot_name="TuBu_PC_R to ER_PC_R",
+                                   plot_folder=plot_folder,
                                    fig_size=fig_size_tb_er_pc)
 
 #Fig. S7dii
 tb_er_pc_l = mapping.ConnectionMap(tb_pc_l, er_pc_l, "BU_L")
 tb_er_pc_l.make_connectivity_plots(plot_name="TuBu_PC_L to ER_PC_L",
+                                   plot_folder=plot_folder,
                                    fig_size=fig_size_tb_er_pc)
 
 
----------
-Figure S8
----------
+# --------- #
+# Figure S8 #
+# --------- #
+plot_folder = "Fig S8"
+
 #Fig. S8ai
 mt3_r_inter_me = mapping.ConnectionMap(mt3_r, mt3_r, "ME_R")
 mt3_r_inter_me.make_connectivity_plots(plot_name="MT3_R Interconnectivity (ME_R)",
+                                       plot_folder=plot_folder,
                                        fig_size=fig_size_mt3)
 
 #Fig. S8aii
 mt3_l_inter_me = mapping.ConnectionMap(mt3_l, mt3_l, "ME_L")
 mt3_l_inter_me.make_connectivity_plots(plot_name="MT3_L Interconnectivity (ME_L)",
+                                       plot_folder=plot_folder,
                                        fig_size=fig_size_mt3)
 
 #Fig. S8bi
 mt3_r_inter_aotu = mapping.ConnectionMap(mt3_r, mt3_r, "AOTU_R")
 mt3_r_inter_aotu.make_connectivity_plots(plot_name="MT3_R Interconnectivity (AOTU_R)",
+                                         plot_folder=plot_folder,
                                          fig_size=fig_size_mt3)
 
 #Fig. S8bii
 mt3_l_inter_aotu = mapping.ConnectionMap(mt3_l, mt3_l, "AOTU_L")
 mt3_l_inter_aotu.make_connectivity_plots(plot_name="MT3_L Interconnectivity (AOTU_L)",
+                                         plot_folder=plot_folder,
                                          fig_size=fig_size_mt3)
 
 #Fig. S8ci
 mt_tb_a_r = mapping.ConnectionMap(mt3_r, tb_a_r, "AOTU_R")
 mt_tb_a_r.make_connectivity_plots(plot_name="MeTu3_R to TuBu_R",
+                                  plot_folder=plot_folder,
                                   fig_size=fig_size_mt_tb_a)
 
 #Fig. S8cii
 mt_tb_a_l = mapping.ConnectionMap(mt3_l, tb_a_l, "AOTU_L")
 mt_tb_a_l.make_connectivity_plots(plot_name="MeTu3_L to TuBu_L",
+                                  plot_folder=plot_folder,
                                   fig_size=fig_size_mt_tb_a)
 
 #Fig. S8di
 tb_er_a_r = mapping.ConnectionMap(tb_a_r, er_a_r, "BU_R")
-tb_er_a_r.make_connectivity_plots(plot_name="TuBu_A_R to ER_A_R",
+tb_er_a_r.make_connectivity_plots(plot_name="uBu_A_R to ER_A_R",
+                                  plot_folder=plot_folder,
                                   fig_size=fig_size_tb_er_a)
 
 #Fig. S8dii
 tb_er_a_l = mapping.ConnectionMap(tb_a_l, er_a_l, "BU_L")
 tb_er_a_l.make_connectivity_plots(plot_name="TuBu_A_L to ER_A_L",
+                                  plot_folder=plot_folder,
                                   fig_size=fig_size_tb_er_a)
 
 #Fig. S8e
 specific.sm17_map_by_dv_axis(plot_name= 
-        "MeTu3bc Vertical Positioning by Connections to Sm17")
+        "MeTu3bc Vertical Positioning by Connections to Sm17",
+        plot_folder=plot_folder)
 
 #Fig. S8g
 specific.mt3_pre_connections(["Sm23", "MeMeDRA", "Mi15"], 
-                             plot_name="MeTu3 Presynaptic")
+                             plot_name="MeTu3 Presynaptic", plot_folder=plot_folder)
 
 
----------
-Figure S9
----------
+# --------- #
+# Figure S9 #
+# --------- #
+plot_folder = "Fig S9"
+
 #Fig. S9ai
 mt4_r_outliers = fw.locs_to_segments(mt4_r_outlier_coords)
 mt4_r_inter_me = mapping.ConnectionMap(mt4_r, mt4_r, "ME_R", exclude = mt4_r_outliers)
 mt4_r_inter_me.make_connectivity_plots(plot_name="MT4_R Interconnectivity (ME_R)",
+                                       plot_folder=plot_folder,
                                        fig_size=fig_size_mt4)
 
 #Fig. S9aii
-mt4_l_outliers = fw.locs_to_segments(mt4_l_outlier_coords)
 mt4_l_inter_me = mapping.ConnectionMap(mt4_l, mt4_l, "ME_L",)
 mt4_l_inter_me.make_connectivity_plots(plot_name="MT4_L Interconnectivity (ME_L)",
+                                       plot_folder=plot_folder,
                                        fig_size=fig_size_mt4)
 
 #Fig. S9bi
 mt4_r_inter_aotu = mapping.ConnectionMap(mt4_r, mt4_r, "AOTU_R",)
 mt4_r_inter_aotu.make_connectivity_plots(plot_name="MT4_R Interconnectivity (AOTU_R)",
+                                         plot_folder=plot_folder,
                                          fig_size=fig_size_mt4)
 
 #Fig. S9bii
 mt4_l_inter_aotu = mapping.ConnectionMap(mt4_l, mt4_l, "AOTU_L",)
 mt4_l_inter_aotu.make_connectivity_plots(plot_name="MT4_L Interconnectivity (AOTU_L)",
+                                         plot_folder=plot_folder,
                                          fig_size=fig_size_mt4)
 
 #Fig. S9ci
 mt_tb_m_r = mapping.ConnectionMap(mt4_r, tb_m_r, "AOTU_R")
 mt_tb_m_r.make_connectivity_plots(plot_name="MeTu4_R to TuBu_R",
+                                  plot_folder=plot_folder,
                                   fig_size=fig_size_mt_tb_m)
 
 #Fig. S9cii
 mt_tb_m_l = mapping.ConnectionMap(mt4_l, tb_m_l, "AOTU_L")
 mt_tb_m_l.make_connectivity_plots(plot_name="MeTu4_L to TuBu_L",
+                                  plot_folder=plot_folder,
                                   fig_size=fig_size_mt_tb_m)
 
 #Fig. S9di
 tb_er_m_r = mapping.ConnectionMap(tb_m_r, er_m_r, "BU_R")
 tb_er_m_r.make_connectivity_plots(plot_name="TuBu_M_R to ER_M_R",
+                                  plot_folder=plot_folder,
                                   fig_size=fig_size_tb_er_m)
 
 #Fig. S9dii
 tb_m_l.insert(1, "TuBu_misc_L")
 tb_er_m_l = mapping.ConnectionMap(tb_m_l, er_m_l, "BU_L")
 tb_er_m_l.make_connectivity_plots(plot_name="TuBu_M_L to ER_M_L",
+                                  plot_folder=plot_folder,
                                   fig_size=fig_size_tb_er_m)
 tb_m_l.remove("TuBu_misc_L")
 
 
-----------
-Figure S12
-----------
+# ---------- #
+# Figure S12 #
+# ---------- #
+plot_folder = "Fig S12"
+
 #Fig. S12a
 neuread.plot_comparison(gen_metu,
         datasets={"FAFB": "LR", "Hemibrain": "R", "FIB-SEM": "R"},
         plot_name="MeTu Neuron Counts Comparison", 
+        plot_folder=plot_folder,
         y_ticks=np.arange(0, 140, 20))
 
 #Fig. S12b
 neuread.plot_comparison(gen_tubu, 
         plot_name="TuBu Neuron Counts Comparison", 
+        plot_folder=plot_folder,
         y_ticks=np.arange(0, 14, 2))
 
 #Fig. S12c
 neuread.plot_comparison(gen_ring,
         datasets={"FAFB": "LR", "Hemibrain": "LR"},
         plot_name="Ring Neuron Counts Comparison", 
+        plot_folder=plot_folder,
         y_ticks=np.arange(0, 14, 2), fig_size = (2.4, 1.25))
 
 #Fig. S12d
 neuread.plot_comparison(gen_bihem, 
         datasets={"FAFB": "LR", "Hemibrain": "LR"},
         plot_name="Bihemispheric Neuron Counts Comparison", 
+        plot_folder=plot_folder,
         y_ticks=np.arange(0, 3, 1))
 
 #Fig. S12e
 neuread.ratio_plot(neuread.Ratio.METU_TO_TUBU, plot_name=\
-    "Ratio of MeTu Neurons to TuBu Neurons per Hemisphere",\
+    "Ratio of MeTu Neurons to TuBu Neurons per Hemisphere",
+    plot_folder=plot_folder,
     y_ticks=np.arange(0, 18, 3))
 
 #Fig. S12f
 neuread.ratio_plot(neuread.Ratio.TUBU_TO_RING, plot_name=\
-    "Ratio of TuBu Neurons to Ring Neurons per Hemisphere",\
+    "Ratio of TuBu Neurons to Ring Neurons per Hemisphere",
+    plot_folder=plot_folder,
     y_ticks=np.arange(0,5,1))
 
 #Fig. S12g
-neuread.lobula_counts(just_metu4=True,\
-        plot_name="Lobula Synapse Count in Hemibrain MeTu4")
+neuread.lobula_counts(just_metu4=True,
+        plot_name="Lobula Synapse Count in Hemibrain MeTu4",
+        plot_folder=plot_folder,)
 
 #Fig. S12h
 specific.full_comparison([f"MeTu4{x}" for x in "abcd"], "LO", 
         plot_name="Lobula Synapse Count per MeTu4 Neuron", 
+        plot_folder=plot_folder,
         y_axis="Lobula Synapse Count")
 
 #Fig. S12i_i-ii
-comparison.mt4e_partner_comparison("Fig S1/MeTu4e/Partner Type Comparison", True)
+comparison.mt4e_partner_comparison("Partner Type Comparison", 
+                                   plot_folder=plot_folder,
+                                   save_figure=True)
 
 #Fig. S12i_iii-viii
-comparison.mt4e_dorsal_comparison("Fig S1/MeTu4e/Comparing", True)
+comparison.mt4e_dorsal_comparison("Comparing",
+                                  plot_folder=plot_folder,
+                                  save_figure=True)
 
 
-----------
-Figure S13
-----------
+# ---------- #
+# Figure S13 #
+# ---------- #
+plot_folder = "Fig S13"
+
 #Fig. S13ai
-comparison.compare_metu("Medulla Presynapse Counts")
+comparison.compare_metu("Medulla Presynapse Count", plot_folder=plot_folder)
 
 #Fig. S13aii
-comparison.compare_metu("Medulla Postsynapse Counts")
+comparison.compare_metu("Medulla Postsynapse Count", plot_folder=plot_folder)
 
 #Fig. S13aiii
-comparison.compare_metu("Column Counts")
+comparison.compare_metu("Column Count", plot_folder=plot_folder)
 
 #Fig. S13aiv
-comparison.compare_metu("AOTU Presynapse Counts")
+comparison.compare_metu("AOTU Presynapse Count", plot_folder=plot_folder)
 
 #Fig. S13av
-comparison.compare_metu("AOTU Postsynapse Counts")
+comparison.compare_metu("AOTU Postsynapse Count", plot_folder=plot_folder)
 
 #Fig. S13avi
-comparison.compare_metu("Ellipse Ratio")
+comparison.compare_metu("Ellipse Ratio", plot_folder=plot_folder)
 
 #Fig. S13bi-viii
 for i in ["Medulla Postsynapse Count", "AOTU Postsynapse Count",
@@ -582,33 +665,38 @@ for i in ["Medulla Postsynapse Count", "AOTU Postsynapse Count",
           "Ellipse Minor Axis Length (nm)"]:
     for j in ["A-P", "V-D"]:
         comparison.scatter_plots(x=f"Relative Offset from Medulla Centroid ({j})",
-                                 y=i, plot_folder=f"{i} {j}/")
+                                 y=i, plot_name=f"{i} {j}", plot_folder=plot_folder)
 
 
-----------
-Figure S14
-----------
+# ---------- #
+# Figure S14 #
+# ---------- #
+plot_folder = "Fig S14"
+
 #Fig. S14a-j
 comparison.nt_by_types(
     [f"{x}_R" for x in comparison.colors], 
     palette=list(comparison.colors.values()), 
-    plot_names=[f"Fig S6/Neurotransmitters/{x}" for x in comparison.colors],
+    plot_names=[f"{x} Neurotransmitter Prediction" for x in comparison.colors.keys()],
+    plot_folder=plot_folder,
     save_figure=True,
     fig_size=(1,0.75), 
     separate_plots=True)
 
 
-----------
-Figure S15
-----------
+# ---------- #
+# Figure S15 #
+# ---------- #
+plot_folder = "Fig S15"
+
 #Fig. S15c
 ring_to_epg = mapping.ConnectionMap(er_all, epg, "EB")
-ring_to_epg.make_type_plots("Fig S30/Ring to EPG", fig_size=(3.0, 4.0))
+ring_to_epg.make_type_plots("Ring to EPG", plot_folder=plot_folder, fig_size=(3.0, 4.0))
 
 
-------------
-Spreadsheets
-------------
+# ------------ #
+# Spreadsheets #
+# ------------ #
 
 #Download "Labels" from https://codex.flywire.ai/api/download and store it
 #in "flycode/Readable" as "Codex Labels 783.csv"
@@ -619,20 +707,22 @@ percent_df = proofreading.full_percent_spread(all_in_paper)
 utils.write_excel(percent_df, "FlyWire Consortium Edit Record")
 
 
-------
-Colors
-------
-"#FF0000" - Red for presynaptic
-"#00FFFF" - Cyan for postsynaptic
+# ------ #
+# Colors #
+# ------ #
+#"#FF0000" - Red for presynaptic
+#"#00FFFF" - Cyan for postsynaptic
 
-"#D62728" - Red for compare figure and MeTu1
-"#1F77B4" - Blue for compare figure and MeTu2
-"#2CA02C" - Green for compare figure and MeTu3
-"#FF8F0E" - Better Yellow for compare figure and MeTu4
-"#FF7F0E" - Orange
-"#BC27D6" - Purple
-"#D627B5" - Pink
-"#27B0D6" - Cyan
+#"#D62728" - Red for compare figure and MeTu1
+#"#1F77B4" - Blue for compare figure and MeTu2
+#"#2CA02C" - Green for compare figure and MeTu3
+#"#FF8F0E" - Better Yellow for compare figure and MeTu4
+#"#FF7F0E" - Orange
+#"#BC27D6" - Purple
+#"#D627B5" - Pink
+#"#27B0D6" - Cyan
+
+
 """
 
 

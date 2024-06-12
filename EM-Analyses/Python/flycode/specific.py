@@ -42,7 +42,7 @@ bulb_subregions = {
         }
 
 
-def sm17_map_by_dv_axis(plot_name="", save_figure=True): 
+def sm17_map_by_dv_axis(plot_name="", plot_folder="", save_figure=True): 
     """Plots MeTu3b and MeTu3c synaptic counts with respect to their offset 
         from the medulla centroid along the d-v axis.
     
@@ -50,6 +50,8 @@ def sm17_map_by_dv_axis(plot_name="", save_figure=True):
     ----------
     plot_name : str, optional
         The name of the output plot. The default is "".
+    plot_folder : str, optional
+        The name of the folder to save the plots to. The default is "".
     save_figure : bool, optional
         Whether to save the figure. The default is True.
         
@@ -98,13 +100,13 @@ def sm17_map_by_dv_axis(plot_name="", save_figure=True):
     ax.spines[['right', 'top']].set_visible(False)
     figures.add_legend(legend=["MeTu3b", "MeTu3c"], marker_scale=1.6)
     if save_figure:
-        figures.save_fig(fig, plot_name=plot_name)
+        figures.save_fig(fig, plot_name=plot_name, folder_path=[plot_folder])
     return type_dict
         
 
      
 
-def fafb_syn_counts(types, region, plot_name="Synapse Counts", 
+def fafb_syn_counts(types, region, plot_name="Synapse Counts", plot_folder="",
                     y_axis="Synapse Count", save_figure=True):
     """Compares regional synaptic counts in the FAFB dataset.
 
@@ -116,6 +118,8 @@ def fafb_syn_counts(types, region, plot_name="Synapse Counts",
         The region in which to compare synaptic counts.
     plot_name : str, optional
         The name of the plot. The default is "Synapse Counts".
+    plot_folder : str, optional
+        The name of the folder to save the plots to. The default is "".
     y_axis : str, optional
         The name of the y-axis. The default is "Synapse Count".
     save_figure : bool, optional
@@ -160,12 +164,13 @@ def fafb_syn_counts(types, region, plot_name="Synapse Counts",
                        order=types, 
                        hue="Synapse Type", 
                        plot_name=plot_name,
+                       folder_path=[plot_folder],
                        palette=["#FF0000","#00FFFF"], 
                        save_figure=save_figure)
     return full_df
 
 
-def full_comparison(types, region, plot_name="Synapse Counts", 
+def full_comparison(types, region, plot_name="Synapse Counts", plot_folder="",
                     neu_outliers=[], y_axis="Synapse Count", 
                     save_figure=True):
     """Compares regional synaptic counts between both datasets.
@@ -178,6 +183,8 @@ def full_comparison(types, region, plot_name="Synapse Counts",
         The region in which to compare synaptic counts.
     plot_name : str, optional
         The name of the plot. The default is "Synapse Counts".
+    plot_folder : str, optional
+        The name of the folder to save the plots to. The default is "".
     neu_outliers : list-like, optional
         Neurons to exclude from the Hemibrain search. The default is [].
     y_axis : str, optional
@@ -230,13 +237,14 @@ def full_comparison(types, region, plot_name="Synapse Counts",
                        hue="Synapse Type", 
                        order=order, 
                        plot_name=plot_name,
+                       folder_path=[plot_folder],
                        save_figure=save_figure, 
                        palette=["#FF0000", "#00FFFF"],
                        fig_size=(2.5,1.25))
     return full_df
     
 
-def mt3_pre_connections(pre_types, plot_name="", 
+def mt3_pre_connections(pre_types, plot_name="", plot_folder="",
                         save_figure=True):
     """Stripplot of MeTu3 subtypes and their presynaptic connections to chosen
         neurons
@@ -247,6 +255,8 @@ def mt3_pre_connections(pre_types, plot_name="",
         Presynaptic neurons to compare connections to MeTu3.
     plot_name : str, optional
         The name of the plot. The default is "".
+    plot_folder : str, optional
+        The name of the folder to save the plots to. The default is "".
     save_figure : bool, optional
         Whether to save the figure. The default is True.
 
@@ -311,12 +321,14 @@ def mt3_pre_connections(pre_types, plot_name="",
                            order=metu3, 
                            palette=["#1F77B4","#D627B5","#2CA02C"],
                            plot_name=f"{plot_name} {plot_type}",
+                           folder_path=[plot_folder],
                            save_figure=temp_save_fig)    
     return neur_df
 
 
     
-def tutu_comparison(save_figure=True, plot_name="TuTu Synapse Counts"):
+def tutu_comparison(save_figure=True, plot_name="TuTu Synapse Counts",
+                    plot_folder=""):
     """
     Makes a bar graph comparing the percentages of TuTu connections that are
         MeTu, TuBu, or other on the ipsilateral and contralateral sides.
@@ -328,6 +340,8 @@ def tutu_comparison(save_figure=True, plot_name="TuTu Synapse Counts"):
     plot_name : str, optional
         What the plot name would be upon saving it. The default is "TuTu Synapse
         Counts".
+    plot_folder : str, optional
+        The name of the folder to save the plots to. The default is "".
         
     Returns
     -------
@@ -374,6 +388,7 @@ def tutu_comparison(save_figure=True, plot_name="TuTu Synapse Counts"):
                            colors=["#FF7F0E","#27B0D6","#D627B5"],
                            fig_size=(2.0, 1.25),
                            plot_name=plot_name,
+                           folder_path=[plot_folder],
                            save_figure=save_figure,
                            color_axis=1)
     
@@ -440,7 +455,8 @@ def get_region_avg_counts(bihem_type, region, side, relevant_subregions={}):
 #radius_factor = 1/2000
 fig_size = tuple((34*4.8)/275 for _ in range(2))
 
-def make_pie_chart(syn_counts, bihem_type, region, side):
+
+def make_pie_chart(syn_counts, bihem_type, region, side, folder_path=[]):
     """Makes pie charts based on the return dict of get_region_avg_counts().
     
     Parameters
@@ -460,6 +476,7 @@ def make_pie_chart(syn_counts, bihem_type, region, side):
     colors = np.array(["#FF0000", "#00FFFF"])
     side = side.capitalize()
     radius_factor = 1/1000 if bihem_type=="AOTU046" else 1/2000
+    folder_path += ["Pie Charts", region]
     for i in syn_counts:
         fig, ax = plt.subplots(figsize=fig_size)
         temp_dict = syn_counts[i]
@@ -469,16 +486,19 @@ def make_pie_chart(syn_counts, bihem_type, region, side):
             return
         radius = total*radius_factor
         plt.pie(pie_arr, colors=colors, radius=radius)
-        file_name = f"Pie Charts/{region}/{bihem_type} {side} {i} {total}"
-        figures.save_fig(fig, plot_name=file_name, 
+        file_name = f"{bihem_type} {side} {i} {total}"
+        figures.save_fig(fig, plot_name=file_name, folder_path=folder_path,
                          file_type=figures.FileType.SVG,
                          transparent=True)
     
 
-
-def make_bihem_pie_charts():
-    """
-    Makes all relevant bihemispheric pie charts.
+def make_bihem_pie_charts(plot_folder=""):
+    """Makes all relevant bihemispheric pie charts.
+    
+    Parameters
+    ----------
+    plot_folder : str
+        The name of the folder to save the plots to.
     """
     bihem_types = ["AOTU046", "TuTuB_a", "TuTuB_b"]
     sides = ["ipsi", "contra"]
@@ -495,7 +515,7 @@ def make_bihem_pie_charts():
                 subregions = aotu_subregions
             avg_counts = get_region_avg_counts(i, j, k, 
                                                relevant_subregions=subregions)
-            make_pie_chart(avg_counts, i, j, k)
+            make_pie_chart(avg_counts, i, j, k, folder_path=[plot_folder])
             all_counts = [avg_counts[x][y] for x in avg_counts 
                           for y in ["pre","post"]]
             highest_count = max(highest_count, max(all_counts))
@@ -506,8 +526,8 @@ def make_bihem_pie_charts():
         radius = i*radius_factor
         color = ["#FF0000"]
         plt.pie([i], colors=color, radius=radius)
-        file_name = f"Pie Charts/Legend Markers {j}/{i}"
-        figures.save_fig(fig, plot_name=file_name, 
+        folder_path = [plot_folder, "Pie Charts", f"Legend Markers {j}"]
+        figures.save_fig(fig, plot_name=i, folder_path=folder_path, 
                          file_type=figures.FileType.SVG,
                          transparent=True)
                                           
