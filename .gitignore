@@ -166,3 +166,6 @@ EM-Analyses/Python/flycode/Generated-Figures/
 
 # Spreadsheet from Codex
 EM-Analyses/Python/flycode/Readable/Codex Labels 783.csv
+#Full synapse spreadsheet
+EM-Analyses/Python/flycode/Readable/Full783.feather
+
