@@ -689,6 +689,20 @@ comparison.nt_by_types(
 # ---------- #
 plot_folder = "Fig S15"
 
+
+#Fig. S15bi
+mapping.add_broad_type("TuBu_R", tb_r)
+mapping.add_broad_type("TuTuB_a", [f"TuTuB_a_{x}" for x in "LR"])
+mapping.add_broad_type("TuTuB_b", [f"TuTuB_b_{x}" for x in "LR"])
+mapping.add_broad_type("AOTU046", [f"AOTU046_{x}" for x in "LR"])
+all_tubu_weights = mapping.get_total_weight(mt_r+["TuTuB_a", "TuTuB_b", "AOTU046"],
+                                             ["TuBu_R"], region="AOTU_R")
+
+#Fig. S15bii
+mapping.add_broad_type("ER_R", er_r)
+mapping.add_broad_type("AOTU046", [f"AOTU046_{x}" for x in "LR"])
+all_ring_weights = mapping.get_total_weight(tb_r+["AOTU046"], ["ER_R"], region="BU_R")
+
 #Fig. S15c
 ring_to_epg = mapping.ConnectionMap(er_all, epg, "EB")
 ring_to_epg.make_type_plots("Ring to EPG", plot_folder=plot_folder, fig_size=(3.0, 4.0))

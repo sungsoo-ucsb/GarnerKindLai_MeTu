@@ -61,6 +61,25 @@ def add_types(types, output=False):
         print(f"Not updated: {not_updated}\n")
 
 
+def add_broad_type(type_name, constituents):
+    """Adds a broad type based on subtypes to neur_ids.
+    
+    Parameters
+    ----------
+    type_name : str
+        The name of the broad type you wish to create.
+    constituents : list-like
+        A list of neuron types that will make up the broad type.
+    """
+    if type_name in neur_ids:
+        return
+    add_types(constituents)
+    type_ids = np.array([], dtype=np.int64)
+    for i in constituents:
+        type_ids = np.concatenate((type_ids, neur_ids[i]))
+    neur_ids[type_name] = type_ids
+
+
 def ids_from_types(types):
     """Returns a list of ids from the given types.
     
@@ -658,4 +677,37 @@ def syn_header(types):
             types_sequential = np.append(types_sequential, i)
     header = np.array([types_sequential, all_ids], dtype="U50")
     return header
+
+
+def get_total_weight(pre_types, post_types, region="Connectome", rounded=2):
+    """Gets the total weight of pre_types on post_types.
+
+    Parameters
+    ----------
+    pre_types : list-like
+        The types that give the connections.
+    post_types : list-like
+        The types that receive the connections.
+    region : str, optional
+        The region by which to limit the search. The default is "Connectome".
+    rounded : int, optional
+        The number of decimal places to round the printed values.
+
+    Returns
+    -------
+    weight_dict : dict
+        The neuron type and its weight on pre_types (rounded to rounded places).
+    """
+    add_types(pre_types + post_types)
+    conn_map = ConnectionMap(pre_types, post_types, region=region)
+    weight_dict = {}
+    for i, j in zip(conn_map.pre_types, conn_map.type_weight_map):
+        weight_dict[i] = j[0]
+        print(f"{i}'s weight on post neurons is {round(j[0], 2)}.")
+    return weight_dict
+
+
+
+
+
 

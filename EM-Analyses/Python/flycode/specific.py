@@ -531,7 +531,7 @@ def make_bihem_pie_charts(plot_folder=""):
                          file_type=figures.FileType.SVG,
                          transparent=True)
                                           
-        
+ 
 
 
 
