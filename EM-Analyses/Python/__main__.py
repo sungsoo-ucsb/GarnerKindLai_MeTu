@@ -221,11 +221,19 @@ for i in ["Excel-Plots", "Generated-Figures", "Importable-Coords",
 plot_folder = "Fig 1"
 
 #Fig. 1c
-colors = ["TPurple", "TPurple", "TBlue", "TRed", "TGreen", "TOrange2", 
-          "TOrange2", "TRed", "TGreen", "TPink"]
-for i, j in zip(maps, colors):
-    density.plot_maps(maps[i], color=j, plot_name=f"{i} Blurrier", blur=10, 
-                      max_value=0.157)
+full_region = density.plot_type_density(\
+        mt_r+tb_r, plot_name="Full Region", plot_folder=plot_folder)
+for i in mt_r+tb_r:
+    if i in mt1_r+tb_pl_r:
+        color = "RegionSolidRed"
+    elif i in mt2_r+tb_pc_r:
+        color = "RegionSolidBlue"
+    elif i in mt3_r+tb_a_r:
+        color = "RegionSolidGreen"
+    else:
+        color = "RegionSolidYellow"
+    density.plot_type_density([i], color=color, plot_name=i, 
+                                plot_folder=plot_folder)
 
 #Fig. 1di
 mt_tb_r = mapping.ConnectionMap(mt_r_general, tb_r, "AOTU_R")

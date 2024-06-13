@@ -64,18 +64,6 @@ type_colors = {
     "MeTu4d_R": "TOrange2"
     }
 
-type_max = {}
-for i in ["MeTu1_R", "TuBu08_R"]:
-    type_max[i] = 0.138351
-for i in ["MeTu2a_R", "MeTu2b_R","TuBu01_R", "TuBu06_R"]:
-    type_max[i] = 0.18535
-for i in ["MeTu3a_R", "MeTu3b_R", "MeTu3c_R", "TuBu07_R", "TuBu09_R", "TuBu10_R"]:
-    type_max[i] = 0.12935
-for i in ["MeTu4a_R", "MeTu4b_R", "MeTu4c_R", "MeTu4d_R", "TuBu02_R", "TuBu03_R", 
-          "TuBu04_R", "TuBu05_R"]:
-    type_max[i] = 0.10949
-
-
 
 def rotate_coord(coord, axis, angle, scale=1):
     """Rotates the coordinate around an axis.
@@ -477,6 +465,32 @@ def plot_region_density(subregion, blur=10, plot_folder="", save_figure=True):
                   plot_folder=plot_folder,
                   save_figure=save_figure)
     return all_maps
+
+
+def plot_type_density(types, blur=4, color="RegionSolidGray", plot_name="",
+                        plot_folder="", save_figure=True):
+    maps = maps_from_types(types)
+    plot_maps(maps,
+              blur=blur,
+              color=color,
+              plot_name=plot_name,
+              plot_folder=plot_folder,
+              save_figure=save_figure)
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
