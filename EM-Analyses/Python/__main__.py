@@ -217,6 +217,7 @@ for i in ["Excel-Plots", "Generated-Figures", "Importable-Coords",
 # -------- #
 # Figure 1 #
 # -------- #
+
 plot_folder = "Fig 1"
 
 #Fig. 1c
@@ -250,6 +251,7 @@ mt_tb_l.make_type_plots(plot_name="Subtyped MeTu_L to TuBu_L",
 # --------- #
 # Figure S1 #
 # --------- #
+
 plot_folder = "Fig S1"
 
 #Fig. S1biii and S1biv
@@ -261,12 +263,14 @@ volumes.get_all_t_tests(f1_scores) #Gets t-test p-scores.
 # --------- #
 # Figure S2 #
 # --------- #
+
 #Figure this one out
 
 
 # --------- #
 # Figure S3 #
 # --------- #
+
 plot_folder = "Fig S3"
 
 #Fig. S3a
@@ -297,6 +301,7 @@ bihem_bu_l.make_type_plots(\
 # --------- #
 # Figure S4 #
 # --------- #
+
 plot_folder = "Fig S4"
 
 #Fig. S4
@@ -309,6 +314,7 @@ eb_inter.make_type_plots(plot_name="EB Interconnectivity",
 # --------- #
 # Figure S5 #
 # --------- #
+
 plot_folder = "Fig S5"
 
 #Fig. S5ai
@@ -362,10 +368,16 @@ tb_er_pl_l.make_connectivity_plots(plot_name="TuBu_PL_L to ER_PL_L",
                                    plot_folder=plot_folder,
                                    fig_size=fig_size_tb_er_pl_l)
 
+#Fig. S5f
+density_plot = density.plot_region_density(density.AotuRegion.POSTERIOR_LATERAL, 
+                                           plot_folder=plot_folder, 
+                                           blur=10)
+
 
 # --------- #
 # Figure S6 #
 # --------- #
+
 plot_folder = "Fig S6"
 
 #Fig. S6a
@@ -402,6 +414,7 @@ specific.tutu_comparison(plot_name="TuTu Synapse Counts Comparison",
 # --------- #
 # Figure S7 #
 # --------- #
+
 plot_folder = "Fig S7"
 
 #Fig. S7ai
@@ -453,10 +466,16 @@ tb_er_pc_l.make_connectivity_plots(plot_name="TuBu_PC_L to ER_PC_L",
                                    plot_folder=plot_folder,
                                    fig_size=fig_size_tb_er_pc)
 
+#Fig. S7f
+density_plot = density.plot_region_density(density.AotuRegion.POSTERIOR_CENTRAL, 
+                                           plot_folder=plot_folder, 
+                                           blur=10)
+
 
 # --------- #
 # Figure S8 #
 # --------- #
+
 plot_folder = "Fig S8"
 
 #Fig. S8ai
@@ -516,10 +535,16 @@ specific.sm17_map_by_dv_axis(plot_name=
 specific.mt3_pre_connections(["Sm23", "MeMeDRA", "Mi15"], 
                              plot_name="MeTu3 Presynaptic", plot_folder=plot_folder)
 
+#Fig. S8h
+density_plot = density.plot_region_density(density.AotuRegion.ANTERIOR, 
+                                           plot_folder=plot_folder, 
+                                           blur=10)
+
 
 # --------- #
 # Figure S9 #
 # --------- #
+
 plot_folder = "Fig S9"
 
 #Fig. S9ai
@@ -573,10 +598,17 @@ tb_er_m_l.make_connectivity_plots(plot_name="TuBu_M_L to ER_M_L",
                                   fig_size=fig_size_tb_er_m)
 tb_m_l.remove("TuBu_misc_L")
 
+#Fig. S9f
+density_plot = density.plot_region_density(density.AotuRegion.MEDIAL, 
+                                           plot_folder=plot_folder, 
+                                           blur=10)
+
+
 
 # ---------- #
 # Figure S12 #
 # ---------- #
+
 plot_folder = "Fig S12"
 
 #Fig. S12a
@@ -643,6 +675,7 @@ comparison.mt4e_dorsal_comparison("Comparing",
 # ---------- #
 # Figure S13 #
 # ---------- #
+
 plot_folder = "Fig S13"
 
 #Fig. S13ai
@@ -676,6 +709,7 @@ for i in ["Medulla Postsynapse Count", "AOTU Postsynapse Count",
 # ---------- #
 # Figure S14 #
 # ---------- #
+
 plot_folder = "Fig S14"
 
 #Fig. S14a-j
@@ -692,6 +726,7 @@ metu_nts = comparison.nt_by_types(\
 # ---------- #
 # Figure S15 #
 # ---------- #
+
 plot_folder = "Fig S15"
 
 
@@ -729,6 +764,7 @@ utils.write_excel(percent_df, "FlyWire Consortium Edit Record")
 # ------ #
 # Colors #
 # ------ #
+
 #"#FF0000" - Red for presynaptic
 #"#00FFFF" - Cyan for postsynaptic
 

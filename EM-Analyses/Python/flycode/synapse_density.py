@@ -8,6 +8,7 @@ Created on Fri Sep 15 10:31:15 2023
 
 import math
 import itertools
+from enum import Enum
 import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt
@@ -17,13 +18,31 @@ import flycode.reduction as reduction
 import flycode.readfiles as readfiles
 import flycode.mapping as mapping
 import flycode.utils as utils
+import flycode.figures as figures
 import flycode.flywire_functions as fw
 
 
 regions = readfiles.import_file("Regions", sheet_name = "Boxes")
 
+class AotuRegion(Enum):
+    POSTERIOR_LATERAL = 1
+    POSTERIOR_CENTRAL = 2
+    ANTERIOR = 3
+    MEDIAL = 4
+
+subregion_types = {
+    AotuRegion.POSTERIOR_LATERAL: {"pre": ["MeTu1_R"], 
+                                   "post": ["TuBu08_R"]},
+    AotuRegion.POSTERIOR_CENTRAL: {"pre": [f"MeTu2{x}_R" for x in "ab"],
+                                   "post": [f"TuBu0{x}_R" for x in "16"]},
+    AotuRegion.ANTERIOR: {"pre": [f"MeTu3{x}_R" for x in "abc"],
+                          "post": [f"TuBu{x}_R" for x in ["07", "09", "10"]]},
+    AotuRegion.MEDIAL: {"pre": [f"MeTu4{x}_R" for x in "abcd"],
+                        "post": [f"TuBu0{x}_R" for x in "2345"]}
+    }
+
 type_colors = {
-    "TuBu01_R": "TBlue",
+    "TuBu01_R": "TGreen",
     "TuBu02_R": "TPink",
     "TuBu03_R": "TBlue",
     "TuBu04_R": "TRed",
@@ -34,11 +53,11 @@ type_colors = {
     "TuBu09_R": "TGreen",
     "TuBu10_R": "TPink",
     "MeTu1_R": "TRed",
-    "MeTu2a_R": "TBlue",
+    "MeTu2a_R": "TGreen",
     "MeTu2b_R": "TPink",
     "MeTu3a_R": "TBlue",
     "MeTu3b_R": "TOrange2",
-    "MeTu3c_R": "TGreen",
+    "MeTu3c_R": "TPink",
     "MeTu4a_R": "TBlue",
     "MeTu4b_R": "TPink",
     "MeTu4c_R": "TGreen",
@@ -58,8 +77,9 @@ for i in ["MeTu4a_R", "MeTu4b_R", "MeTu4c_R", "MeTu4d_R", "TuBu02_R", "TuBu03_R"
 
 
 
-def rotate_coord(coord: np.array, axis, angle, scale=1):
-    """
+def rotate_coord(coord, axis, angle, scale=1):
+    """Rotates the coordinate around an axis.
+    
     Parameters
     ----------
     coord : np.array
@@ -202,13 +222,14 @@ def make_map(df, x_steps, y_steps, z_steps, spacing, plane, vert=False,
     Parameters
     ----------
     df : pd.DataFrame
-        Synapse dataframe given by flywire.get_synapses().
+        Synapse dataframe given by flycode.flywire_functions.fetch_synapses()
+        or flywire.get_synapses(). 
     x_steps : np.array
-        Given by get_steps().
+        Evenly spaced steps along the x-axis, can be given by get_steps().
     y_steps : np.array
-        Given by get_steps().
+        Evenly spaced steps along the y-axis, can be given by get_steps().
     z_steps : np.array
-        Given by get_steps().
+        Evenly spaced steps along the z-axis, can be given by get_steps().
     spacing : int, optional
         The distance each step should be. The default is 10.
     plane : str
@@ -307,7 +328,7 @@ def xz_map(df, steps, spacing, region, angle, scale):
             region=region, angle=angle, scale=scale)
 
 
-def all_maps(df, spacing=10, region="AOTU_R", angle=30, scale=1.3):
+def get_all_maps(df, spacing=10, region="AOTU_R", angle=30, scale=1.3):
     """Creates maps by make_map along each axis.
     
     Parameters
@@ -340,7 +361,7 @@ def maps_from_types(neur_types, spacing=10, region="AOTU_R", angle=30, scale=1.3
 
     Parameters
     ----------
-    neur_types : list
+    neur_types : list-like
         The neuron types by which to find the maps.
     spacing : int, optional
         The distance each step should be. The default is 10.
@@ -354,59 +375,24 @@ def maps_from_types(neur_types, spacing=10, region="AOTU_R", angle=30, scale=1.3
     Returns
     -------
     tuple
-        all_maps() run on the neuron types.
-
+        get_all_maps() run on the neuron types.
     """
     mapping.add_types(neur_types)
     all_ids = mapping.ids_from_types(neur_types)
     df = fw.fetch_synapses(all_ids)
     df = reduction.remove_autapses(df)
-    return all_maps(df, spacing = spacing, region = region, angle = angle, 
+    return get_all_maps(df, spacing = spacing, region = region, angle = angle, 
                     scale = scale)
-
-
-def maps_from_mt_tb(metu, tubu):
-    """Gets maps that limit the search to just synapses between MeTu and TuBu
-        neurons.
-
-    Parameters
-    ----------
-    metu : list
-        The MeTu types to limit the search.
-    tubu : list
-        The TuBu types to limit the search.
-
-    Returns
-    -------
-    maps : tuple
-        all_maps() run on each neuron type, but limited to the synapses between
-        MeTu and TuBu neurons.
-    """
-    mapping.add_types(metu+tubu, output=False)
-    maps = {}
-    all_ids = mapping.ids_from_types(metu+tubu)
-    metu_ids = mapping.ids_from_types(metu)
-    tubu_ids = mapping.ids_from_types(tubu)
-    df = fw.fetch_synapses(all_ids, region="AOTU_R")
-    for i in metu:
-        temp_df = df[df["pre"].isin(mapping.neur_ids[i])]
-        temp_df = temp_df[temp_df["post"].isin(tubu_ids)]
-        maps[i] = all_maps(temp_df)
-    for i in tubu:
-        temp_df = df[df["post"].isin(mapping.neur_ids[i])]
-        temp_df = temp_df[temp_df["pre"].isin(metu_ids)]
-        maps[i] = all_maps(temp_df)
-    return maps
     
 
 def plot_maps(maps, color="TPurple", blur=4, max_value=0,
-              plot_name="", save_figure=True):
+              plot_name="", plot_folder="", save_figure=True):
     """Plots the synapse density maps.
     
     Parameters
     ----------
     maps : tuple
-        Maps given by all_maps()
+        Maps given by get_all_maps()
     color : str
         A color within the Colors spreadsheet.
     blur : float
@@ -414,7 +400,9 @@ def plot_maps(maps, color="TPurple", blur=4, max_value=0,
     max_value : float
         The maximum value to be put in the corner of the plot for normalization.
     plot_name : str, optional
-        The name of the plot. The default is ""
+        The name of the plot. The default is "".
+    plot_folder : str, optional
+        The name of the folder to save the plots to. The default is "".
     save_figure : bool, optional
         Whether to save the figure. The default is True.
     """
@@ -431,12 +419,64 @@ def plot_maps(maps, color="TPurple", blur=4, max_value=0,
                             ax.get_position().y0,0.02,ax.get_position().height])
         cbar = plt.colorbar(img, cax=cax)
         cbar.ax.tick_params(labelsize = 6)
-        temp_plot_name = f"Synapse Density/{plot_name} {j}"
+        temp_plot_name = f"{plot_name} {j}"
         if save_figure:
-            utils.save_fig(fig, plot_name=temp_plot_name, transparent=True)
+            figures.save_fig(fig, 
+                             plot_name=temp_plot_name, 
+                             folder_path=[plot_folder, "Synapse Density"], 
+                             transparent=True)
 
 
+def plot_region_density(subregion, blur=10, plot_folder="", save_figure=True):
+    """Makes MeTu and TuBu synapse density plots in a given AOTU subregion.
 
+    Parameters
+    ----------
+    subregion : int, Enum value from AotuSubregion(). 
+        The subregion with which to limit the search.
+    blur : scalar, optional
+        The value by which to blur the Gaussian filter. The default is 10.
+    plot_folder : str, optional
+        The name of the folder to save the plots to. The default is "".
+    save_figure : bool, optional
+        Whether to save the figure. The default is True.
+
+    Returns
+    -------
+    all_maps : dict
+        The maps generated for each neuron type.
+    """
+    metu_types = subregion_types[subregion]["pre"]
+    metu_ids = mapping.ids_from_types(metu_types)
+    tubu_types = subregion_types[subregion]["post"]
+    tubu_ids = mapping.ids_from_types(tubu_types)
+    df = fw.fetch_synapses(np.concatenate((metu_ids, tubu_ids)), 
+                           region="AOTU_R")
+    all_maps = {}
+    for i in metu_types:
+        temp_ids = mapping.ids_from_types(i)
+        temp_df = df[df.pre.isin(temp_ids)]
+        temp_df = temp_df[temp_df.post.isin(tubu_ids)]
+        all_maps[i] = get_all_maps(temp_df)
+    for i in tubu_types:
+        temp_ids = mapping.ids_from_types(i)
+        temp_df = df[df.post.isin(temp_ids)]
+        temp_df = temp_df[temp_df.pre.isin(metu_ids)]
+        all_maps[i] = get_all_maps(temp_df)
+    max_value = 0
+    for i in all_maps:
+        for j in all_maps[i]:
+            temp_blur = gaussian_filter(j, sigma=blur)
+            max_value = max(max_value, np.max(temp_blur))
+    for i in all_maps:
+        plot_maps(all_maps[i],
+                  color=type_colors[i],
+                  blur=blur,
+                  max_value=max_value,
+                  plot_name=f"{i} Density Map Blur {blur}",
+                  plot_folder=plot_folder,
+                  save_figure=save_figure)
+    return all_maps
 
 
 
