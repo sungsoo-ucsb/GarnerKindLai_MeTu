@@ -469,6 +469,28 @@ def plot_region_density(subregion, blur=10, plot_folder="", save_figure=True):
 
 def plot_type_density(types, blur=4, color="RegionSolidGray", plot_name="",
                         plot_folder="", save_figure=True):
+    """Plots synapse density of a certain neuron type.
+
+    Parameters
+    ----------
+    types : list-like
+        A list of neuron types of which to retrieve the synapse density.
+    blur : scalar, optional
+        The sigma value of the Gaussian blur on the plot. The default is 4.
+    color : str, optional
+        A color within the Colors spreadsheet. The default is "RegionSolidGray".
+    plot_name : str, optional
+        The name of the plot. The default is "".
+    plot_folder : str, optional
+        The name of the folder to save the plots to. The default is "".
+    save_figure : bool, optional
+        Whether to save the figure. The default is True.
+        
+    Returns
+    -------
+    maps : tuple
+        The maps given by maps_from_types().
+    """
     maps = maps_from_types(types)
     plot_maps(maps,
               blur=blur,
@@ -476,6 +498,7 @@ def plot_type_density(types, blur=4, color="RegionSolidGray", plot_name="",
               plot_name=plot_name,
               plot_folder=plot_folder,
               save_figure=save_figure)
+    return maps
 
 
 
