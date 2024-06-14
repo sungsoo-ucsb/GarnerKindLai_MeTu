@@ -30,6 +30,7 @@ import flycode.annotations as annotations
 import flycode.volumes as volumes
 import flycode.flywire_functions as fw
 import flycode.figures as figures
+import flycode.path_weights as path_weights
 
 
 line_width = 0.2#0.0645

@@ -52,7 +52,7 @@ def get_cx_df(full_df):
         A dataframe with just the neurons in the CX.
 
     """
-    info_df = readfiles.import_file("CX Neurons", sheet_name="CX with Outside")
+    info_df = readfiles.import_file("CX_Neurons", sheet_name="CX non-Interneurons")
     cx_neurs = np.asarray(info_df.neurs)
     cx_df = full_df[full_df.post.isin(cx_neurs)]
     cx_df = cx_df[(~(cx_df.neuropil.isin(["PB", "FB", "EB", "NO"])))| \
