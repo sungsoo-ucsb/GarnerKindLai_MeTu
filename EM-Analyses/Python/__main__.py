@@ -132,6 +132,9 @@ er_all_all = er_all_plus_lal[:12] + ["ER3_misc_R"] + er_all_plus_lal[12:]
 
 exr = [f"ExR{x!s}_{y}" for x in range(1,9) for y in "LR"]
 
+all_path_neurs = er_all_all + exr + [f"{x}_{y}" for x in ["FB8B", "OA-AL2i1", 
+                                                          "IbSpsP", "LNO2"] for y in "LR"]
+
 epg = [f"EPG_R{x!s}" for x in range(8,0,-1)]+\
       [f"EPG_L{x!s}" for x in range(1,9)]
 epg_retino = [f"EPG_{x}{y}" for x,y in zip("LR"*8, 
@@ -273,7 +276,22 @@ volumes.get_all_t_tests(f1_scores) #Gets t-test p-scores.
 # Figure S2 #
 # --------- #
 
-#Figure this one out
+plot_folder = "Fig S2"
+
+#Fig. S2a
+path_weights.make_weight_strip_plot("CX Neuron Weight Strip Plot", plot_folder=plot_folder)
+
+#Fig. S2bi
+exr1_path = path_weights.get_renderable_neurs("ExR1")
+
+#Fig. S2bii
+fb8b_path = path_weights.get_renderable_neurs("FB8B")
+
+#Fig. S2biii
+oaal_path = path_weights.get_renderable_neurs("OA-AL2i1")
+
+#Fib. S2biv
+exr5_path = path_weights.get_renderable_neurs("ExR5")
 
 
 # --------- #
