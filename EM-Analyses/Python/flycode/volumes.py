@@ -278,8 +278,6 @@ def plot_f1(f1_scores, plot_folder=""):
         colors = ["#D62728", "#1F77B4", "#2CA02C"]
         for patch, color in zip(bplot['boxes'], colors):
             patch.set_facecolor(color)
-        
-            
         for median in bplot['medians']:
             median.set_color('black')
         

@@ -11,6 +11,8 @@ import os
 import collections
 import numpy as np
 import pandas as pd
+import matplotlib.pyplot as plt
+import seaborn as sns
 import flycode.mapping as mapping
 import flycode.reduction as reduction
 import flycode.readfiles as readfiles
@@ -255,4 +257,104 @@ def make_weight_strip_plot(plot_name="", plot_folder="", save_figure=True):
     return weight_df
     
     
+def make_whisker_plot(plot_name="", plot_folder="", save_figure=True):
+    """Makes a box plot and strip plot that contains the optic lobe weights of
+    AVP ring neurons, non-AVP ring neurons, and other CX neurons.
+
+    Parameters
+    ----------
+    plot_name : str, optional
+        The name of the figure to be saved. The default is "".
+    plot_folder : str, optional
+        The folder in which to save the figure. The default is "".
+    save_figure : bool, optional
+        Whether to save the figure. The default is True.
+    """
+    weight_df = readfiles.import_file("CX_Neurons", sheet_name = "CX non-Interneurons")
+    fig, (ax1, ax2) = plt.subplots(1, 2, figsize=(5.0, 2.5))
+    x_label = "Neuron Class"
+    y_label = "Optic Lobe Weight"
+    general_types = ["AVP Neurons to EB", "Non-AVP Neurons to EB", "Other CX Neurons"]
+    
+    plt.sca(ax1)
+    data = [np.asarray(weight_df[weight_df.general_type==x].total_weight) \
+                    for x in general_types]
+    width_prop = {'linewidth': 0.3}
+    bplot = plt.boxplot(data,
+                        vert=True,
+                        patch_artist=True,
+                        flierprops={'marker': '_',
+                                    'markersize': 3,
+                                    'markeredgewidth': 0.3},
+                        boxprops= width_prop,
+                        medianprops=width_prop,
+                        whiskerprops=width_prop,
+                        capprops=width_prop)
+    palette = ["#4400dd", "#e6194B", "#EBC400"]
+    for patch, color in zip(bplot['boxes'], palette):
+        patch.set_facecolor(color)
+    for median in bplot['medians']:
+        median.set_color('black')
+    
+    weight_df.rename(columns={"general_type": "Neuron Class",
+                              "total_weight": "Optic Lobe Weight"},
+                     inplace=True)
+    plt.sca(ax2)
+    strip = sns.stripplot(data=weight_df,
+                          x=x_label, 
+                          y=y_label, 
+                          hue=None, 
+                          order=general_types,
+                          palette=palette,
+                          dodge=False,
+                          size=2.5)
+    plt.xlabel(x_label,
+               fontsize=figures.font_size)
+    plt.ylabel(y_label,
+               fontsize=figures.font_size)
+    plt.xticks(rotation=figures.xtick_rotation,
+               ha=figures.ha,
+               rotation_mode=figures.rotation_mode,
+               fontsize=figures.font_size)
+    plt.yticks(fontsize=figures.font_size)
+    sns.boxplot(showmeans=True,
+                meanprops={"markerfacecolor": "k",
+                           "markeredgecolor": "k",
+                           "marker": "_",
+                           "markersize": 4},
+                medianprops={'visible': False},
+                whiskerprops={'visible': False},
+                zorder=10,
+                x=x_label,
+                y=y_label,
+                data=weight_df,
+                showfliers=False,
+                showbox=False,
+                showcaps=False,
+                ax=strip)
+    if save_figure:
+        figures.save_fig(plt,
+                         plot_name=plot_name,
+                         folder_path=[plot_folder])
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+
+
+
+
+
+
+
+
+
+
+
 
