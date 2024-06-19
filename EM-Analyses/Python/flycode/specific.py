@@ -585,7 +585,7 @@ def get_bihem_weights(min_weight=0.05):
 
 def get_bihem_weight_line_width(min_weight=0.05):
     """Gets the line width of arrows for the bihemispheric weight figure, using
-    the formula y=2.5x+0.455.
+    the formula y=8.611x+1.5494.
 
     Parameters
     ----------
@@ -601,7 +601,7 @@ def get_bihem_weight_line_width(min_weight=0.05):
     weight_dict = get_bihem_weights(min_weight=min_weight)
     line_dict = {}
     for i in weight_dict:
-        thickness = 2.5*weight_dict[i] + 0.455
+        thickness = 8.611*weight_dict[i] + 1.5494
         line_dict[i] = round(thickness, 1)
     return line_dict
 

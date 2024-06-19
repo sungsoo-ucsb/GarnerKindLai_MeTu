@@ -755,20 +755,31 @@ metu_nts = comparison.nt_by_types(\
 # ---------- #
 
 plot_folder = "Fig S15"
-
+width_conversion = lambda x : 200.59*x - 0.0621
 
 #Fig. S15bi
 mapping.add_broad_type("TuBu_R", tb_r)
 mapping.add_broad_type("TuTuB_a", [f"TuTuB_a_{x}" for x in "LR"])
 mapping.add_broad_type("TuTuB_b", [f"TuTuB_b_{x}" for x in "LR"])
 mapping.add_broad_type("AOTU046", [f"AOTU046_{x}" for x in "LR"])
-all_tubu_weights = mapping.get_total_weight(mt_r+["TuTuB_a", "TuTuB_b", "AOTU046"],
-                                             ["TuBu_R"], region="AOTU_R")
+all_tubu_weights = mapping.get_total_weight(mt_r+["AOTU046", "TuTuB_a", "TuTuB_b"],
+        ["TuBu_R"], 
+        region="AOTU_R",
+        rounded=1,
+        width_conversion=width_conversion)
+for i in all_tubu_weights:
+    print(i, all_tubu_weights[i])
 
 #Fig. S15bii
 mapping.add_broad_type("ER_R", er_r)
 mapping.add_broad_type("AOTU046", [f"AOTU046_{x}" for x in "LR"])
-all_ring_weights = mapping.get_total_weight(tb_r+["AOTU046"], ["ER_R"], region="BU_R")
+all_ring_weights = mapping.get_total_weight(tb_r+["AOTU046"], 
+        ["ER_R"], 
+        region="BU_R",
+        rounded=1,
+        width_conversion=width_conversion)
+for i in all_ring_weights:
+    print(i, all_ring_weights[i])
 
 #Fig. S15c
 ring_to_epg = mapping.ConnectionMap(er_all, epg, "EB")

@@ -679,7 +679,8 @@ def syn_header(types):
     return header
 
 
-def get_total_weight(pre_types, post_types, region="Connectome", rounded=2):
+def get_total_weight(pre_types, post_types, region="Connectome", rounded=2,
+                     width_conversion=lambda x : x):
     """Gets the total weight of pre_types on post_types.
 
     Parameters
@@ -692,6 +693,10 @@ def get_total_weight(pre_types, post_types, region="Connectome", rounded=2):
         The region by which to limit the search. The default is "Connectome".
     rounded : int, optional
         The number of decimal places to round the printed values.
+    width_conversion : callable, optional
+        A function that converts the weight to a relative value used when making
+        figures (for instance, a linear conversion). The default maintains the
+        same weight value.
 
     Returns
     -------
@@ -702,8 +707,7 @@ def get_total_weight(pre_types, post_types, region="Connectome", rounded=2):
     conn_map = ConnectionMap(pre_types, post_types, region=region)
     weight_dict = {}
     for i, j in zip(conn_map.pre_types, conn_map.type_weight_map):
-        weight_dict[i] = j[0]
-        print(f"{i}'s weight on post neurons is {round(j[0], 2)}.")
+        weight_dict[i] = round(width_conversion(j[0]), rounded)
     return weight_dict
 
 
