@@ -204,6 +204,7 @@ regions = {"AME_L": 1, "LO_L": 2, "NO": 3, "BU_L": 4, "PB": 5, "LH_L": 6,
 for i in regions.copy():
     regions[regions[i]] = i
 
+#Sets up required subdirectories
 plot_folder = ""
 directory = os.path.dirname(__file__)
 directory = os.path.join(directory, "flycode")
