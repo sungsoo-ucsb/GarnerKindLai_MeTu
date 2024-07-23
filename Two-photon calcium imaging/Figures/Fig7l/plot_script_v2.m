@@ -1,6 +1,6 @@
 clear
 %
-figure(1)
+figure
 set(gcf,'color','w');
 set(gcf, 'Position', [230,430,400,200])
 
@@ -110,7 +110,7 @@ for line = 1:2
         rho = zeros(size(theta)) ;
         rho(1,1) = 0; rho(1, end) = 0; rho(1,2:end-1) = plot_count(i);
         [xl,yl] = pol2cart(theta,rho);
-        fill([xl],[yl], plot_color)%,'FaceAlpha',0.6,'EdgeAlpha',0);
+        fill(xl,yl, plot_color)
         hold on
     end
     
@@ -123,3 +123,12 @@ for line = 1:2
     end
     axis square; set(ax_cart,'visible','off');
 end
+
+filename = 'fig7l';
+papersize = [2, 1];
+hf = gcf;
+units = 'inches';
+set(hf, 'PaperUnits', units)
+set(hf, 'papersize', papersize);
+set(hf, 'PaperPosition', [0, 0, papersize(1), papersize(2)]);
+print(hf, '-dpdf', filename);
