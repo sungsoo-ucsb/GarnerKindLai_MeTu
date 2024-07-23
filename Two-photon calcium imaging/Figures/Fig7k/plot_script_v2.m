@@ -1,8 +1,7 @@
-%%
 clear
-figure(1)
+figure
 set(gcf,'color','w');
-set(gcf, 'Position', [230,430,300,100])
+set(gcf, 'Position', [230,430,400,200])
 ellipse_ratio = zeros(1,2);
 ellipse_angle = zeros(1,2);
 semimajor_axis = zeros(1,2);
@@ -54,3 +53,12 @@ for line = 1:2
     ax.YAxis.Color = 'k';
     ax.YAxis.TickValues = [1 2 3 4 5 6];
 end
+
+filename = 'fig7k';
+papersize = [4/2, 2/2 ];
+hf = gcf;
+units = 'inches';
+set(hf, 'PaperUnits', units)
+set(hf, 'papersize', papersize);
+set(hf, 'PaperPosition', [0, 0, papersize(1), papersize(2)]);
+print(hf, '-dpdf', filename);
