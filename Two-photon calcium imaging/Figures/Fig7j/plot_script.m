@@ -2,7 +2,7 @@ clear
 load('position_info.mat')
 figure(1)
 set(gcf,'color','w');
-set(gcf, 'Position', [230,430,200,100])
+set(gcf, 'Position', [230,430,200,400])
 
 for line = 1:2
     if line == 1 %R4d
@@ -17,7 +17,7 @@ for line = 1:2
         load ellipse_data_ER2.mat
     end
 
-subplot(1,2,line)
+    subplot(2,1,line)
     vertex = [27	4.5
         27	-31.5
         45	-49.5
@@ -31,7 +31,7 @@ subplot(1,2,line)
     for i = 1:8
         x2 = [vertex(i,1) vertex(i+1,1)]; y2 = [vertex(i,2) vertex(i+1,2)];
         line_color = [0 0 0 1];
-        outline1 = plot(x2, y2, 'color', line_color, 'LineWidth', 0.5, 'LineStyle','-');
+        outline1 = plot(x2, y2, 'color', line_color, 'LineWidth', 1, 'LineStyle','-');
         hold on
     end
 
@@ -49,8 +49,6 @@ subplot(1,2,line)
         b =  minor_axis_length(1,k);
         Xc = centroid_x(1,k);
         Yc = centroid_y(1,k);
-        WXc = Wcentroid_x(1,k);
-        WYc = Wcentroid_y(1,k);
         phi = deg2rad(orientation(1,k));
 
         t = linspace(0,2*pi,50);
@@ -62,33 +60,30 @@ subplot(1,2,line)
             MarkColor = [0.25 0.6 0];
         end
 
-        ht = patch(rad2deg(x),rad2deg(y),MarkColor,'EdgeColor',MarkColor,'EdgeAlpha', 0.4,'FaceAlpha',0.1);
-        %ht = patch(rad2deg(x),rad2deg(y),MarkColor,'EdgeColor','none','FaceAlpha',0.09);
-        ht.Parent.LineWidth = 0.5;
+        ht = patch(rad2deg(x),rad2deg(y),MarkColor,'EdgeColor',MarkColor,'EdgeAlpha', 0.4,'FaceAlpha',0.1,'LineWidth',1);
+        ht.Parent.LineWidth = 1;
         hold on
 
     end
 
     hold on
     axis equal
-    ht.Parent.YLim = [-62 37];
-    ht.Parent.XLim = [10 107];
 
     %
     x3 = [15 15]; y3 = [-60 40];
-    y_axis_line = plot(x3, y3, '-k', 'LineWidth',0.5);
+    y_axis_line = plot(x3, y3, '-k', 'LineWidth',1);
 
     for y_ticks = [  -60, -40, -20 , 0, 20, 40]
         x3 = [13 15]; y3 = [y_ticks y_ticks];
-        y_tick_line = plot(x3, y3, '-k', 'LineWidth',0.5);
+        y_tick_line = plot(x3, y3, '-k', 'LineWidth',1);
     end
 
     x3 = [20 100]; y3 = [-65 -65];
-    x_axis_line = plot(x3, y3, '-k', 'LineWidth',0.5);
+    x_axis_line = plot(x3, y3, '-k', 'LineWidth',1);
 
     for x_ticks = [20, 40, 60, 80, 100]
         x3 = [x_ticks x_ticks]; y3 = [-67 -65];
-        x3_tick_line = plot(x3, y3, '-k', 'LineWidth',0.5);
+        x3_tick_line = plot(x3, y3, '-k', 'LineWidth',1);
     end
     axis off
     set(gca, 'box', 'off')
@@ -99,5 +94,13 @@ subplot(1,2,line)
 
     axis off
     set(gca, 'box', 'off')
-
 end
+
+filename = 'fig7k';
+papersize = [2, 4];
+hf = gcf;
+units = 'inches';
+set(hf, 'PaperUnits', units)
+set(hf, 'papersize', papersize);
+set(hf, 'PaperPosition', [0, 0, papersize(1), papersize(2)]);
+print(hf, '-dpdf', filename);
