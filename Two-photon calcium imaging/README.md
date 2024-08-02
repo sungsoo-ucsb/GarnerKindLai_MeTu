@@ -5,8 +5,7 @@ Required software: MATLAB R2023b
 No special hardware requirement.
 
 Run the main_analysis.m Part 1 to analyze the sample 2p dataset. 
-It took 27.6 min on a regular computer.
+It took around 15 min on a regular computer.
 
-Figure 7k-l can be reproduced by running the scripts in the "Two-photon calcium imaging\Figures\" folder,
-using the pre-processed data.
+Run the main_analysis.m Part 2 to reproduce plots in Fig 5 using the pre-processed data.
 
