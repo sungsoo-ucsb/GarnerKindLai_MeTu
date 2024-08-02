@@ -37,8 +37,7 @@ for ROI = 1:total_ROI-1
                 count = count + 1;
             end
         end
-        temp = mean(activity(1:replicates, 1));
-        RF_weight(pos,ROI) = temp; %blue
+        RF_weight(pos,ROI) = mean(activity(1:replicates, 1));
         p_values(pos,ROI) = signrank(group1(1,:), group2(1,:));
     end
 end

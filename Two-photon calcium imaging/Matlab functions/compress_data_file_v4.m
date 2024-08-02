@@ -1,11 +1,9 @@
 function [data_compressed, TP_count_compressed, TP_count_original, photodiode_count_compressed, stimuli_start_time, stim_time_method] = compress_data_file_v4(dataset_name, photodiode_threshold, total_trials, Dnum)
 
 load(['data_' dataset_name '.mat'])
-
-
 timepoint = length(data(1,:));
-data_compressed = zeros(Dnum, timepoint/10);
-stim_time_method = 'photodiode';
+data_compressed = zeros(Dnum, timepoint/10); %compress to 1/10
+
 
 TP_signal = zeros(1, length(data));
 for i = 6:length(data)-10
@@ -47,17 +45,8 @@ for i = 1:length(data_compressed(1,:))
     count = count+10;
 end
 
-photodiode_signal = zeros(1, length(data_compressed(1,:)));
+photodiode_signal = movmean(data_compressed(7,:),8);
 
-if photodiode_threshold == -0.0606 || photodiode_threshold == -0.060|| photodiode_threshold == -0.046|| photodiode_threshold == -0.064
-    photodiode_signal = movmean(data_compressed(7,:),4);
-else
-    if photodiode_threshold == -0.045 || photodiode_threshold == -0.05 || photodiode_threshold == -0.065 || photodiode_threshold == -0.07|| photodiode_threshold == -0.061
-        photodiode_signal = movmean(data_compressed(7,:),6);
-    else
-        photodiode_signal = movmean(data_compressed(7,:),8);
-    end
-end
 
 for i = 1:length(data_compressed(1,:))
     if photodiode_signal(1,i) < photodiode_threshold
@@ -91,12 +80,15 @@ for i = 1:length(data_compressed)
     end
 end
 
-
 photodiode_count_compressed = 0;
 for i = 2:length(data_compressed(1,:))
     if data_compressed(7,i) > 1 && data_compressed(7,i-1) < 1
         photodiode_count_compressed = photodiode_count_compressed +1;
     end
+end
+
+if photodiode_count_compressed ~= total_trials
+    disp('error in photodiode signal')
 end
 
 stimuli_start_time = zeros(total_trials, 1);

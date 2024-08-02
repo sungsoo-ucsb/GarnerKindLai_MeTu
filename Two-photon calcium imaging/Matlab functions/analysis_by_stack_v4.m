@@ -34,10 +34,7 @@ for q = 1:flcount
     vol = 1;
     A = sliceNum+flyback;
     index = linspace(1,A,A);
-    z_plane_index = index;
-    for i = 1:vol_per_file-1
-        z_plane_index = [z_plane_index index];
-    end 
+    z_plane_index = repmat(index, 1, vol_per_file);
 
     reader = ScanImageTiffReader(file_name);
     volume = reader.data();
@@ -73,12 +70,8 @@ for q = 1:flcount
     %step 2
     Registered_tif = zeros(size(Tif_processed));
     index = linspace(1,sliceNum,sliceNum);
-    z_plane_index = index;
-    for i = 1:vol_per_file-1
-        z_plane_index = [z_plane_index index];
-    end
+    z_plane_index = repmat(index, 1, vol_per_file);
     
-
     Tif_processed_gaussfilt = imgaussfilt3(Tif_processed(:,:,:), [0.1 0.1 sliceNum]); 
     vol = 1;
     for i = 1:length(Registered_tif(pixel,pixel,:))
