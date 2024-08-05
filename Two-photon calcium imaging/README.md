@@ -1,4 +1,4 @@
-Download a sample 2p dataset from https://sungsoo-nas1.mcdb.ucsb.edu:5001/sharing/nU6uifCJC
+Download a sample 2p dataset from https://sungsoo-nas1.mcdb.ucsb.edu:5001/sharing/6CNsIviWR
 (and all code in the "Two-photon calcium imaging" github folder)
 
 Required software: MATLAB R2023b
