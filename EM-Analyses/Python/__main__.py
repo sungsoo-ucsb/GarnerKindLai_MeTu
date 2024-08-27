@@ -115,7 +115,9 @@ upstream_neurons = ['Dm2_R','DmDRA1_R','Mi15_R','R7_R','R7DRA_R','TmY31_R',
                     'cM01c_R','cM02b_R','cM08a_R','cM12_L','cM13_L','MTe01a_R'] +\
                    [f'{x}_{y}' for y in "LR" for x in ['MeMeDRA','aMe19b',
                                                        'MeMe_e01','MeMe_e02',
-                                                       'MeMe_e10',]] 
+                                                       'MeMe_e10',]] +\
+                   [f'Sm{x}_R' for x in ['04', '06', '07', '12', '14', '15',
+                                         '16', '17', '18', '23', '25', '42']]
     
 
 upstream_with_mi1 = upstream_neurons[:13] + ["Mi1_L", "Mi1_R"] + \
@@ -787,6 +789,22 @@ ring_to_epg = mapping.ConnectionMap(er_all, epg, "EB")
 ring_to_epg.make_type_plots("Ring to EPG", plot_folder=plot_folder, fig_size=(3.0, 4.0))
 
 
+# -------- #
+# Figure 3 #
+# -------- #
+plot_folder = "Fig 3"
+colors = {"a": "#0072B2", "b": "#E69F00", "c": "#029F73", "d": "#CD79A7"}
+for i, j in zip([["ME Anterior-Posterior", "AOTU Dorsal-Ventral"],
+                 ["ME Dorsal-Ventral", "AOTU Medial-Lateral"]],
+                ["A-P to D-V Retinotopy", "D-V to M-L Retinotopy"]):
+    for k in range(2, 5):
+        palette = {f"MeTu{k}{x}" :colors[x] for x in ["a", "b", "c", "d"][:k]}
+        comparison.scatter_plots(x=i[0], y=i[1], type_palette = palette,
+                                 plot_name=f"MeTu{k} {j}", plot_folder=plot_folder,
+                                 format_type=comparison.FormatType.RETINOTOPY,
+                                 fig_size=(1.2, 0.9))
+
+
 # ------------ #
 # Spreadsheets #
 # ------------ #
@@ -815,6 +833,17 @@ utils.write_excel(percent_df, "FlyWire Consortium Edit Record")
 #"#BC27D6" - Purple
 #"#D627B5" - Pink
 #"#27B0D6" - Cyan
+
+"MeTu1": "#e6194B",
+"MeTu2a": "#f58231",
+"MeTu2b": "#EBC400",
+"MeTu3a": "#bfef45",
+"MeTu3b": "#3cb44b",
+"MeTu3c": "#3E7748",
+"MeTu4a": "#42d4f4",
+"MeTu4b": "#7587C9",
+"MeTu4c": "#4400dd",
+"MeTu4d": "#911eb4"
 
 
 """

@@ -6,6 +6,7 @@ Created on Tue Oct 24 11:42:24 2023
 @author: Dustin Garner
 """
 
+from enum import Enum
 import numpy as np
 import pandas as pd
 from pydantic import BaseModel
@@ -34,7 +35,11 @@ dv_table = dv_table.rename(columns = {
         "ap": "Relative Offset from Medulla Centroid (A-P)",
         "eli_ratio": "Ellipse Ratio",
         "a": "Ellipse Major Axis Length (nm)",
-        "b": "Ellipse Minor Axis Length (nm)"})
+        "b": "Ellipse Minor Axis Length (nm)",
+        "aotu_centroid_y": "AOTU Dorsal-Ventral",
+        "aotu_centroid_x": "AOTU Medial-Lateral"})
+dv_table["ME Dorsal-Ventral"] = dv_table["Relative Offset from Medulla Centroid (V-D)"] * -1
+dv_table["ME Anterior-Posterior"] = dv_table["Relative Offset from Medulla Centroid (A-P)"]
 spacing = {
     "Medulla Postsynapse Count": [0, 1200],
     "AOTU Postsynapse Count": [0, 180],
@@ -42,7 +47,15 @@ spacing = {
     "AOTU Presynapse Count": [0, 800],
     "Column Count": [0, 120],
     "Relative Offset from Medulla Centroid (V-D)": [-1, 1],
-    "Relative Offset from Medulla Centroid (A-P)": [-1, 1]
+    "Relative Offset from Medulla Centroid (A-P)": [-1, 1],
+    "AOTU Dorsal-Ventral": [min(dv_table["AOTU Dorsal-Ventral"]),
+                            max(dv_table["AOTU Dorsal-Ventral"])],
+    "AOTU Medial-Lateral": [min(dv_table["AOTU Medial-Lateral"]),
+                            max(dv_table["AOTU Medial-Lateral"])],
+    "ME Dorsal-Ventral": [min(dv_table["ME Dorsal-Ventral"]),
+                          max(dv_table["ME Dorsal-Ventral"])],
+    "ME Anterior-Posterior": [min(dv_table["ME Anterior-Posterior"]),
+                              max(dv_table["ME Anterior-Posterior"])]
     }
 colors = {
     "MeTu1": "#e6194B",
@@ -63,6 +76,10 @@ adjusted_name = {
     "Position Along Medulla Ventral-Dorsal Axis": \
         "Position Along Medulla\nVentral-Dorsal Axis"
     }
+
+class FormatType(Enum):
+    ME_POSITION = 1
+    RETINOTOPY = 2
 
 
 def compare_metu(column, save_figure=True, plot_folder=""):
@@ -91,7 +108,9 @@ def compare_metu(column, save_figure=True, plot_folder=""):
                        show_means=True)
 
 
-def scatter_plots(x, y, plot_name="", plot_folder="", save_figure=True):
+def scatter_plots(x, y, type_palette={}, plot_name="", plot_folder="", 
+                  save_figure=True, fig_size = (1.9,1.5), 
+                  format_type=FormatType.ME_POSITION):
     """Makes scatter plots comparing two columns of dv_table for each MeTu
         subtype, as well as a plot with all subtypes together and their
         line of best fits together as two different subplots.
@@ -102,32 +121,50 @@ def scatter_plots(x, y, plot_name="", plot_folder="", save_figure=True):
         The column in dv_table to be plotted on the x-axis.
     y : str
         The column in dv_table to be plotted on the y-axis.
+    type_palette : dict, optional
+        Includes types you want included and their plotted colors. It defaults
+        to the variable colors.
     plot_name : str, optional
         The name of the saved figure. The default is "".
     plot_folder : str, optional
         The folder which the plots get save to. The default is "".
     save_figure : bool, optional
         Whether to save the figure as a file. The default is True.
+    fig_size : tuple, optional
+        The size of the figure. The default is (1.9, 1.25).
+    format_type : int, optional
+        The format type of the scatter plots. This is one of the enum values of
+        FormatType. The default is FormatType.ME_POSITION.
     """
-    fig, ax = plt.subplots(figsize=(1.9,1.5))
-    for i in colors:
+    fig, ax = plt.subplots(figsize=fig_size)
+    type_palette = colors if type_palette=={} else type_palette
+    for i in type_palette:
         temp_df = dv_table[dv_table["MeTu Subtype"]==i]
         a, b = np.polyfit(temp_df[x], temp_df[y], 1)
-        ax.plot(temp_df[x], a*temp_df[x]+b, c=colors[i], linewidth=0.5, zorder=0)
+        ax.plot(temp_df[x], a*temp_df[x]+b, c=type_palette[i], linewidth=0.5, zorder=0)
         plt.xlim(spacing[x][0], spacing[x][1])
         if y in spacing:
             plt.ylim(spacing[y][0], spacing[y][1])
         ax.scatter(x=temp_df[x], y=temp_df[y],
-                    s=dot_size, c=colors[i], zorder=1)
+                    s=dot_size, c=type_palette[i], zorder=1)
         
-    
-    medulla = "Medulla"
-    end_x_pos = x.find(medulla) + len(medulla)
-    xlabel = f"{x[:end_x_pos]}\n{x[end_x_pos+1:]}"
-    fig.text(0.565, -0.02, xlabel, ha='center', fontsize=font_size)
-    fig.text(0.05, 0.4, y, ha='center', rotation=90, fontsize=font_size)
-    plt.xticks(fontsize=font_size)
-    plt.yticks(fontsize=font_size)
+    if format_type==FormatType.ME_POSITION:
+        medulla = "Medulla"
+        end_x_pos = x.find(medulla) + len(medulla)
+        xlabel = f"{x[:end_x_pos]}\n{x[end_x_pos+1:]}"
+        fig.text(0.565, -0.02, xlabel, ha='center', fontsize=font_size)
+        fig.text(0.05, 0.4, y, ha='center', rotation=90, fontsize=font_size)
+        plt.xticks(fontsize=font_size)
+        plt.yticks(fontsize=font_size)
+    elif format_type==FormatType.RETINOTOPY:
+        end_y_pos = y.find(" ") + 1
+        y = f"{y[:end_y_pos]}\n{y[end_y_pos:]}"
+        fig.text(0.5, 0.032, x, ha='center', fontsize=font_size)
+        fig.text(0.025, 0.24, y, ha='center', rotation=90, fontsize=font_size)
+        ax.xaxis.set_tick_params(labelbottom=False)
+        ax.yaxis.set_tick_params(labelleft=False)
+        plt.tick_params(axis='both', which='both', length=0)
+        ax.spines[['right', 'top']].set_visible(False)
     fig.tight_layout()
     if not save_figure:
         return

@@ -171,4 +171,5 @@ EM-Analyses/Python/flycode/Excel-Plots/
 EM-Analyses/Python/flycode/Readable/Codex Labels 783.csv
 #Full synapse spreadsheet
 EM-Analyses/Python/flycode/Readable/Full783.feather
-
+#Readable files
+EM-Analyses/Python/flycode/Readable/

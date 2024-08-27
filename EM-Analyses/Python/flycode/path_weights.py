@@ -38,7 +38,7 @@ def get_full_df():
     return full_df
 
 
-def get_cx_df(full_df):
+def get_cx_df(full_df=None):
     """Gets a dataframe with all synapses in which CX non-interneurons are
     postsynaptic and the synapses are not within the CX itself (exempting TuBu
     presynapses, which are sometimes labeled as located within the CX while 
@@ -55,6 +55,8 @@ def get_cx_df(full_df):
         A dataframe with CX neuron postsynapses.
 
     """
+    if full_df==None:
+        full_df = get_full_df()
     info_df = readfiles.import_file("CX_Neurons", sheet_name="CX non-Interneurons")
     cx_neurs = np.asarray(info_df.root_id)
     cx_df = full_df[full_df.post.isin(cx_neurs)]
@@ -349,7 +351,28 @@ def make_whisker_plot(plot_name="", plot_folder="", save_figure=True):
 
 
 
+def test():
+    """Gets a dataframe with all synapses in which CX non-interneurons are
+    postsynaptic and the synapses are not within the CX itself (exempting TuBu
+    presynapses, which are sometimes labeled as located within the CX while 
+    they are really in the bulb).
 
+    Parameters
+    ----------
+    full_df : pd.DataFrame
+        The dataframe retrieved from get_full_df().
+
+    Returns
+    -------
+    cx_df : pd.DataFrame
+        A dataframe with CX neuron postsynapses.
+
+    """
+    info_df = readfiles.import_file("CX_Neurons", sheet_name="CX non-Interneurons")
+    cx_neurs = np.asarray(info_df.root_id)
+    cx_df = get_cx_df()
+    cx_df = cx_df[~(cx_df.pre.isin(cx_neurs))]
+    return cx_df
 
 
 
