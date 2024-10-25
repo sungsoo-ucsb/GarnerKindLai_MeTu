@@ -1,7 +1,7 @@
 # GarnerKindLai_MeTu
 GarnerKindLai_MeTu paper
-https://www.biorxiv.org/content/10.1101/2023.11.29.569241v1
-(Currently under revision.)
+https://www.nature.com/articles/s41586-024-07967-z
+
 
 ## OS
 All EM analyses were performed in MacOS using R and Python. All calcium imaging analyses were performed in Windows using Matlab.
