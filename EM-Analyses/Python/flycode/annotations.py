@@ -10,11 +10,13 @@ import datetime
 import numpy as np
 import pandas as pd
 from fafbseg import flywire
-import flycode.metu_comparison as comparison
 import flycode.mapping as mapping
 import flycode.utils as utils
 import flycode.flywire_functions as fw
 
+
+client = fw.client
+version = client.materialize.version
 
 user_ids = {
     2: ["Sven Dorkenwald", "Sebastian Seung Lab"],
@@ -64,11 +66,7 @@ user_ids = {
     2935: ["Lena Lörsch", "Marion Silies Lab"],
     3431: ["juan felipe vargas fique", "Marion Silies Lab"],
     3504: ["Jenna Joroff", "Wei-Chung Lee lab"]
-    }
-
-
-client = fw.client
-version = client.materialize.version
+}
 
 
 def test_types(neur_types):
@@ -96,7 +94,7 @@ def test_types(neur_types):
         l = len(mapping.neur_ids[f"{i}_L"])
         r = len(mapping.neur_ids[f"{i}_R"])
         length = len(df[(df["tag"]==i) & (df["user_id"]==100)])
-        print(i, length, l+r, length==l+r)
+        print(f'Type: {i} has {length} / {l+r} neurons with the same name as my scheme in the annotations spreadsheet.')
     
 
 def compare_annotations(neur_types):
@@ -114,8 +112,7 @@ def compare_annotations(neur_types):
     """
     neur_ids = {}
     for i in neur_types:
-        neur_ids[i] = fw.locs_to_segments(mapping.neur_coords[i],
-                                    timestamp=f"mat_{version!s}")
+        neur_ids[i] = fw.locs_to_segments(mapping.neur_coords[i])
     
     anno_df = client.materialize.query_table("neuron_information_v2", \
             split_positions=True, 
@@ -188,7 +185,7 @@ def compare_annotations(neur_types):
                         np.append(label_dict["user_affiliation"],
                                                     user_ids[temp_id][1])
     label_df = pd.DataFrame(label_dict)
-    utils.write_excel(label_df, "Codex Naming History")
+    utils.write_excel(label_df, "Codex Annotations History")
     return label_df
 
         

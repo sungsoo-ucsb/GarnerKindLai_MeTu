@@ -125,14 +125,14 @@ def add_legend(legend=None, marker_scale=1.2):
 
     Parameters
     ----------
-    legend : matplotlib.Legend, optional
+    legend : matplotlib.pyplot.Legend, optional
         The pre-existing legend, if there is one. The default is None.
     marker_scale : float, optional
         The size of legend marker scales. The default is 1.2.
 
     Returns
     -------
-    leg : matplotlib.Legend
+    leg : matplotlib.pyplot.Legend
         The resulting legend.
 
     """
@@ -148,7 +148,7 @@ def add_legend(legend=None, marker_scale=1.2):
     return leg
 
 
-def strip_plot(data, x_label, y_label, order, hue, palette, plot_name, 
+def create_strip_plot(data, x_label, y_label, order, hue, palette, plot_name, 
                folder_path=[], dodge=True, save_figure=True, fig_size=(2.0, 1.25),
               show_means=False, mean_type=".", size=2.5, lim_range=None):
     """Makes a strip plot.
@@ -233,6 +233,8 @@ def strip_plot(data, x_label, y_label, order, hue, palette, plot_name,
     if save_figure:
         save_fig(fig, plot_name=plot_name, folder_path=folder_path)
 
+strip_plot = create_strip_plot
+
 
 def create_bar_graph(data, x_label, y_label, x_ticks, y_ticks, colors,
                      fig_size, plot_name, save_figure, folder_path=[],
@@ -253,7 +255,7 @@ def create_bar_graph(data, x_label, y_label, x_ticks, y_ticks, colors,
         The names of clusters of bars.
     y_ticks : np.array
         The spacing of number values on the y-axis.
-    colors : lits
+    colors : list
         Values are the colors that each bar corresponds to.
     fig_size : tuple
         The size of the figure.

@@ -72,10 +72,6 @@ colors = {
 metu_types = list(colors.keys())
 nts = ['gaba', 'acetylcholine', 'glutamate',
        'octopamine', 'serotonin', 'dopamine']
-adjusted_name = {
-    "Position Along Medulla Ventral-Dorsal Axis": \
-        "Position Along Medulla\nVentral-Dorsal Axis"
-    }
 
 class FormatType(Enum):
     ME_POSITION = 1
@@ -176,14 +172,15 @@ def scatter_plots(x, y, type_palette={}, plot_name="", plot_folder="",
 def nt_by_types(neur_types, plot_names=["NTs"], plot_folder="",
                 region="Connectome", palette=["#000000"], save_figure=True,
                 fig_size=(1.6,1.25), separate_plots=False):
-    """Makes a plot of the neurotransmitters for the neuron types.
+    """Makes a plot or multiple plots of the neurotransmitters for the 
+    neuron types.
 
     Parameters
     ----------
     neur_types : list-like
         Neuron types in Neuron Spreadsheet.
-    plot_names : str, optional
-        What to name the plot. The default is "NTs".
+    plot_names : list-like, optional
+        What to name the plots. The default is "NTs".
     plot_folder : str, optional
         The name of the folder to save the plots to. The default is "".
     region : str, optional
@@ -257,7 +254,7 @@ def get_mt4e():
     -------
     types : dict
         Keys are "Other MeTu4a" and "Putative MeTu4e", and the values are arrays
-        of neurons..
+        of neurons.
     """
     mt4e_file = readfiles.import_file("MeTu4a_4e_candidates", file_type="csv")
     root_ids = np.array(mt4e_file.root_id)
@@ -275,7 +272,8 @@ def get_mt4e():
 
 
 def mt4e_partner_comparison(plot_name, plot_folder="", save_figure=False):
-    """Makes a graph comparing putative MeTu4e partners to other MeTu4a.
+    """Makes plots comparing presynaptic and postsynaptic partners of MeTu4a 
+    and putative MeTu4e.
 
     Parameters
     ----------
@@ -348,7 +346,7 @@ def mt4e_partner_comparison(plot_name, plot_folder="", save_figure=False):
     return df
 
 
-def mt4e_dorsal_comparison(plot_name, plot_folder="", save_figure=True):
+def mt4e_dendrite_comparison(plot_name, plot_folder="", save_figure=True):
     """Makes a graph comparing putative MeTu4e to other MeTu4a by medulla
     position along the D-V axis.
 
@@ -376,24 +374,9 @@ def mt4e_dorsal_comparison(plot_name, plot_folder="", save_figure=True):
         new_types.append(temp_type)
     dorsal_locs["Putative Type"] = new_types
     rename =   {"den_count_me": "Medulla Postsynapse Count",
-                #"den_count_aotu": "AOTU Postsynapse Count",
                 "pre_syn_count_me": "Medulla Presynapse Count",
-                #"pre_syn_count_aotu": "AOTU Presynapse Count",
                 "column_count": "Medulla Column Count",
-                #"den_centroid_x": "Medulla x Position",
-                #"den_centroid_y": "Medulla y Position",
-                #"den_centroid_z": "Medulla z Position",
-                #"den_centroid_x_m6_xform": "Medulla x M6 Xform",
-                #"den_centroid_y_m6_xform": "Medulla y M6 Xform",
-                #"den_centroid_z_m6_xform": "Medulla z M6 Xform",
                 "dv": "Relative Offset from Medulla Centroid (D-V)",
-                #"ap": "Relative Offset from Medulla Centroid (A-P)",
-                #"aotu_centroid_x": "AOTU x Position",
-                #"aotu_centroid_y": "AOTU y Position",
-                #"aotu_centroid_z": "AOTU z Position",
-                #"angle": "Ellipse Angle",
-                #"angle_deg": "Ellipse Angle Degrees",
-                #"eli_ratio": "Ellipse Ratio",
                 "a": "Ellipse Major Axis Length (nm)",
                 "b": "Ellipse Minor Axis Length (nm)"}
     dorsal_locs.rename(columns=rename, inplace=True)

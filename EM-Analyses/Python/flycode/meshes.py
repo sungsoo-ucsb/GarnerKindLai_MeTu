@@ -1,4 +1,3 @@
-#!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 """
 Created on Tue Oct 24 11:42:24 2023
@@ -38,12 +37,12 @@ def get_file_path(file_name):
 
 
 def save_neurs(neur_ids, file_name="", downsample=False):
-    """Saves a single neuron ID as a mesh.
+    """Saves a single neuron or multiple neuron IDs as a single mesh.
 
     Parameters
     ----------
-    neur_id : int
-        A neuron ID.
+    neur_ids : int or list-like
+        A neuron ID or multiple IDs.
     file_name : str, optional
         The name to store the mesh as. The default is the first neuron ID.
     downsample : bool, optional

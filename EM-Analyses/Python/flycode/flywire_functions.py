@@ -58,7 +58,6 @@ def fetch_cave_synapses(neur_id):
     df = df[df["pre_pt_root_id"]!=df["post_pt_root_id"]]
     df = df[(df["pre_pt_root_id"] != 0) & (df["post_pt_root_id"] != 0)]
     df = df[df["cleft_score"]>=50]
-    
     return df
 
 

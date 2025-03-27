@@ -38,7 +38,7 @@ def get_full_df():
     return full_df
 
 
-def get_cx_df(full_df=None):
+def get_cx_df(full_df=pd.DataFrame()):
     """Gets a dataframe with all synapses in which CX non-interneurons are
     postsynaptic and the synapses are not within the CX itself (exempting TuBu
     presynapses, which are sometimes labeled as located within the CX while 
@@ -55,7 +55,7 @@ def get_cx_df(full_df=None):
         A dataframe with CX neuron postsynapses.
 
     """
-    if full_df==None:
+    if full_df.empty:
         full_df = get_full_df()
     info_df = readfiles.import_file("CX_Neurons", sheet_name="CX non-Interneurons")
     cx_neurs = np.asarray(info_df.root_id)
@@ -368,11 +368,94 @@ def test():
         A dataframe with CX neuron postsynapses.
 
     """
+    seen_neurs = np.array([], dtype=np.int64)
+    full_df = get_full_df()
     info_df = readfiles.import_file("CX_Neurons", sheet_name="CX non-Interneurons")
     cx_neurs = np.asarray(info_df.root_id)
-    cx_df = get_cx_df()
+    cx_df = get_cx_df(full_df)
     cx_df = cx_df[~(cx_df.pre.isin(cx_neurs))]
-    return cx_df
+    seen_neurs = np.concatenate((seen_neurs, cx_neurs))
+    layer2 = np.unique(cx_df.pre)
+    layer2_df = full_df[full_df.post.isin(layer2)]
+    layer2_df = layer2_df[~(layer2_df.pre.isin(seen_neurs))]
+    #return layer2_df
+    layer2_df = reduction.remove_min_synapses(layer2_df, min_syns=5, pre_or_post="post")
+    layer2_df = reduction.remove_min_synapses(layer2_df, min_syns=5, pre_or_post="pre")
+    seen_neurs = np.concatenate((seen_neurs, layer2))
+    layer3 = np.unique(layer2_df.pre)
+    layer3_df = full_df[full_df.post.isin(layer3)]
+    layer3_df = layer3_df[~(layer3_df.pre.isin(seen_neurs))]
+    halt = mapping.ids_from_types(['Haltere_R'])
+    layer3_df = layer3_df[layer3_df.pre.isin(halt)]
+    layer3_df = reduction.remove_min_synapses(layer3_df, min_syns=5, pre_or_post="post")
+    layer3_df = reduction.remove_min_synapses(layer3_df, min_syns=5, pre_or_post="pre")
+    return layer3_df
+
+
+def get_pre_spread():
+    conn_map = mapping.ConnectionMap(['Haltere_R'], ['Halt_Path_Layer_3_R'], 'Connectome')
+
+
+
+def get_dng_weights(full_df = pd.DataFrame()):
+    if full_df.empty:
+        full_df = get_full_df()
+    dng_types = [f'DNg02_{x}_{y}' for x in 'abcdefg' for y in 'LR']
+    layer3_types = ['Optic Lobe', 'PFL1', 'PFL3']
+    dng = mapping.ids_from_types(dng_types)
+    pfl1 = mapping.ids_from_types([f'PFL1_{x}' for x in 'LR'])
+    pfl3 = mapping.ids_from_types([f'PFL3_{x}' for x in 'LR'])
+    layer2_optic = np.asarray(readfiles.import_file('DNg_Neurons', 
+                                         sheet_name='layer2_optic').root_id)
+    layer3_optic = np.asarray(readfiles.import_file('DNg_Neurons', 
+                                         sheet_name='layer3_optic').root_id)
+    weights = {x: [0, 0, 0] for x in dng}
+    dng_df = full_df[full_df.post.isin(dng)]
+    full_layer2 = np.unique(dng_df.pre)
+    full_layer2_df = full_df[full_df.post.isin(full_layer2)]
+    for i in dng:
+        temp_df = dng_df[dng_df.post==i]
+        layer2 = np.unique(temp_df.pre)
+        layer2_df = full_layer2_df[full_layer2_df.post.isin(layer2)]
+        for j in layer2:
+            temp_df2 = temp_df[temp_df.pre==j]
+            weight1 = len(temp_df2)/len(temp_df)
+            temp_layer2_df = layer2_df[layer2_df.post==j]
+            seen_optic = False
+            if j in layer2_optic:
+                weights[i][0] += weight1
+                seen_optic = True
+            if len(temp_layer2_df)==0:
+                continue
+            for k in range(3):
+                if k==0 and seen_optic:
+                    continue
+                layer3 = [layer3_optic, pfl1, pfl3][k]
+                temp_layer2_df2 = temp_layer2_df[temp_layer2_df.pre.isin(layer3)]
+                weight2 = len(temp_layer2_df2)/len(temp_layer2_df)
+                weights[i][k] += weight2 * weight1
+    weight_map = {x: [] for x in ['neur_type', 'root_id', 'weight', 'input_type']}
+    for i in dng_types:
+         for j in mapping.ids_from_types([i]):
+             for k in range(3):
+                 weight_map['neur_type'].append(i[:-2])
+                 weight_map['root_id'].append(j)
+                 weight_map['weight'].append(weights[j][k])
+                 weight_map['input_type'].append(layer3_types[k])
+    weight_df = pd.DataFrame(weight_map)
+    return weight_df
+    
+
+
+
+
+
+
+
+
+
+
+
 
 
 

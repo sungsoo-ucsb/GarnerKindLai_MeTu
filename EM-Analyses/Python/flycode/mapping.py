@@ -99,17 +99,17 @@ def ids_from_types(types):
     return np.concatenate(([neur_ids.get(x, np.array([])) for x in types]))
 
 
-def copy_types(neur_types, output=True):
+def copy_types(types, output=True):
     """Copies neurons of certain types to the clipboard.
 
     Parameters
     ----------
-    neur_types : str, list-like
+    types : str, list-like
         Neuron types you want copied.
     output : bool, optional
         Whether to print the number of neurons copied. The default is True.
     """
-    neur_ids = ids_from_types(neur_types)
+    neur_ids = ids_from_types(types)
     utils.copy_ids(neur_ids, output=output)
 
 
@@ -140,20 +140,20 @@ def find_neur_type(neur_id, search=[], unidentified_type=""):
     return unidentified_type
 
 
-def check_existence_in_region(neur_types, regions, min_syns=10):
+def check_existence_in_region(types, regions, min_syns=10):
     """Checks whether any neurons from the given types do not have at least 
         min_syns in the given regions.
     
     Parameters
     ----------
-    neur_types : list-like
+    types : list-like
         Neuron types in Neuron Spreadsheet.
     regions : list-like
         The regions to test.
     min_syns : int, Optional
         Below this number the neuron is displayed in output.
     """
-    ids = ids_from_types(neur_types)
+    ids = ids_from_types(types)
     syn_df = fw.fetch_synapses(ids)
     for i in ids:
         temp_df = syn_df[(syn_df["pre"]==i) | (syn_df["post"]==i)]
@@ -164,20 +164,20 @@ def check_existence_in_region(neur_types, regions, min_syns=10):
                 print(f"{i!s} has {number_syns!s} connections in {j}")
 
 
-def find_partners(neurons, region, pre_or_post, min_neurs=5):
+def find_partners(neur_ids, region, pre_or_post, min_syns=5):
     """Finds the pre_or_post partners of all of the given neurons. Returns a 
         dictionary of the partner with number of connection and an array of 
         just the partners.
     
     Parameters
     ----------
-    neurons : list-like
+    neur_ids : list-like
         Neuron IDs.
     region : str
         The region to limit the search.
     pre_or_post : str
-        Whether pre or postsynaptic connections are wanted
-    min_neurs : int, Optional
+        Whether pre or postsynaptic connections are wanted.
+    min_syns : int, Optional
         The lowest number of connections to be shown in the output.
         
     Returns
@@ -188,25 +188,25 @@ def find_partners(neurons, region, pre_or_post, min_neurs=5):
     """
     pre = False if pre_or_post=="pre" else True
     post = not pre
-    syn_df = fw.fetch_synapses(neurons, pre=pre, post=post)
+    syn_df = fw.fetch_synapses(neur_ids, pre=pre, post=post)
     syn_df = reduction.lim_region(syn_df, region)
     all_partners = np.unique(np.array(syn_df[pre_or_post]))
     for i in all_partners:
         temp_df = syn_df[syn_df[pre_or_post]==i]
-        if len(temp_df)<min_neurs:
+        if len(temp_df)<min_syns:
             syn_df = syn_df[syn_df[pre_or_post]!=i]
     new_partners = np.array(syn_df[pre_or_post])
-    neur_dict = utils.count_instances(new_partners, min_neurs=min_neurs)
+    neur_dict = utils.count_instances(new_partners, min_neurs=min_syns)
     return neur_dict
     
 
-def partner_df(ids, region="Connectome", pre=True, post=True, 
-           autapses=False, min_synapses=1):
+def partner_df(neur_ids, region="Connectome", pre=True, post=True, 
+           autapses=False, min_syns=1):
     """Retrieves the partner spreadsheet from Flywire.
     
     Parameters
     ----------
-    ids : int or list of int
+    neur_ids : int or list of int
         Neurons that you want to find the partners of.
     region : str
         The region to limit the map to.
@@ -216,7 +216,7 @@ def partner_df(ids, region="Connectome", pre=True, post=True,
         Whether you want the neurs to be post.
     autapses : bool
         If False, removes autapses.
-    min_synapses : int
+    min_syns : int
         Limits the df to this number of neurons.
 
     Returns
@@ -224,26 +224,28 @@ def partner_df(ids, region="Connectome", pre=True, post=True,
     syn_df: pd.DataFrame
         The resulting synapse dataframe.
     """
-    syn_df = fw.fetch_synapses(ids, pre=pre, post=post)
+    syn_df = fw.fetch_synapses(neur_ids, pre=pre, post=post)
     syn_df = reduction.lim_region(syn_df, region)
     if not autapses:
         syn_df = reduction.remove_autapses(syn_df)
-    syn_df = reduction.remove_min_synapses(syn_df, min_syns=min_synapses)
+    for i, j in zip([pre, post], ['pre', 'post']):
+        if i:
+            syn_df = reduction.remove_min_synapses(syn_df, min_syns=min_syns, pre_or_post=j)
     return syn_df
 
 
-def make_syn_maps(df, pre_neurs, post_neurs, min_synapses=3, exclude=[]):
+def make_syn_maps(syn_df, pre_neurs, post_neurs, min_syns=5, exclude=[]):
     """Makes connectivity and weight maps given a dataframe from Flywire.
 
     Parameters
     ----------
-    df : pandas.DataFrame
-        A neuron dataframe given by flywire.get_neurons.
+    syn_df : pandas.DataFrame
+        A neuron dataframe given by flywire.get_neurons().
     pre_neurs : list-like
         The pre-synaptic neurons.
     post_neurs : list-like
         The post-synaptic neurons.
-    min_synapses : int, optional, the default is 3.
+    min_syns : int, optional, the default is 5.
         The minimum number of synapses when making the minimized weight map.
     exclude : list-like, optional
         The neurons to be excluded from being counted in the plot.
@@ -256,7 +258,7 @@ def make_syn_maps(df, pre_neurs, post_neurs, min_synapses=3, exclude=[]):
         Weight map of the percent of connections from the presynaptic neuron
         to the given postsynaptic neuron.
     min_map : np.array
-        Same as weight map but only if the neurons have greater than min_synapses
+        Same as weight map but only if the neurons have greater than min_syns
         total.
     """
     pre_count = len(pre_neurs)
@@ -266,7 +268,7 @@ def make_syn_maps(df, pre_neurs, post_neurs, min_synapses=3, exclude=[]):
     min_map = np.zeros((pre_count, post_count), dtype=float)
     
     for indi, i in enumerate(post_neurs):
-        temp_df = df[df["post"]==i]
+        temp_df = syn_df[syn_df["post"]==i]
         total_connections = len(temp_df)
         if total_connections==0: #Prevents from dividing by zero
             print(f"{i!s} does not have connections.")
@@ -275,19 +277,19 @@ def make_syn_maps(df, pre_neurs, post_neurs, min_synapses=3, exclude=[]):
             partner_count = 0 if (i in exclude or j in exclude) else \
                     len(temp_df[temp_df["pre"]==j])
             synaptic_weight = partner_count/total_connections
-            min_weight = synaptic_weight if total_connections>=min_synapses else 0
+            min_weight = synaptic_weight if total_connections>=min_syns else 0
             syn_map[indj][indi] = partner_count
             weight_map[indj][indi] = synaptic_weight
             min_map[indj][indi] = min_weight
     return syn_map, weight_map, min_map
 
 
-def make_type_maps(df, pre_types, post_types):
+def make_type_maps(syn_df, pre_types, post_types):
     """Makes type connectivity and weight maps given a dataframe from Flywire.
 
     Parameters
     ----------
-    df : pandas.DataFrame
+    syn_df : pandas.DataFrame
         A neuron dataframe given by flywire.get_neurons.
     pre_types : list-like
         The pre-synaptic types.
@@ -307,7 +309,7 @@ def make_type_maps(df, pre_types, post_types):
     type_map = np.zeros((len(pre_types), len(post_types)), dtype=np.uint64)
     weight_map = np.zeros((len(pre_types), len(post_types)), dtype=float)
     for indi, i in enumerate(post_types):
-        temp_df = df[df["post"].isin(neur_ids[i])]
+        temp_df = syn_df[syn_df["post"].isin(neur_ids[i])]
         total_connections = len(temp_df)
         for indj, j in enumerate(pre_types):
             type_connections = len(temp_df[temp_df["pre"].isin(neur_ids[j])])
@@ -319,7 +321,7 @@ def make_type_maps(df, pre_types, post_types):
 
 class ConnectionMap: 
     #Creates maps between pre types and post types in a region.
-    def __init__(self, pre_types, post_types, region, min_synapses=5, \
+    def __init__(self, pre_types, post_types, region, min_syns=5, \
                  exclude=[], font_size=6):
         """Creates maps between pre types and post types in a region.
 
@@ -331,12 +333,12 @@ class ConnectionMap:
             The types with postsynaptic neurons.
         region : str
             The region by which to limit the map.
-        min_synapses : int, optional
+        min_syns : int, optional
             The minimum number of synapses in min_maps. The default is 3.
         exclude : list-like, optional
             The neurons to exclude from weight maps. The default is [].
         font_size : int, optional
-            The font size of the generated figures. The default is 6.ß
+            The font size of the generated figures. The default is 6.
         """
         self.pre_types = pre_types
         self.post_types = post_types
@@ -344,12 +346,12 @@ class ConnectionMap:
         
         self.pre_neurs = ids_from_types(self.pre_types)
         self.post_neurs = ids_from_types(self.post_types)
-        self.syn_df = partner_df(ids=self.post_neurs, region=self.region, \
+        self.syn_df = partner_df(neur_ids=self.post_neurs, region=self.region, \
                                  pre=False)
             
-        self.syn_map, self.weight_map, self.weight_map_min_3=\
+        self.syn_map, self.weight_map, self.weight_map_minimized=\
             make_syn_maps(self.syn_df, self.pre_neurs, self.post_neurs,\
-                         min_synapses=min_synapses, exclude=exclude)
+                         min_syns=min_syns, exclude=exclude)
         self.type_map, self.type_weight_map = make_type_maps(self.syn_df,
                                             self.pre_types, self.post_types)
         
@@ -408,8 +410,6 @@ class ConnectionMap:
         ----------
         type_list : list-like
             List of types.
-        starting_point : float, optional
-            The starting location of the label. The default is -0.5.
 
         Returns
         -------
@@ -569,7 +569,8 @@ class ConnectionMap:
             figures.save_fig(fig, plot_name=plot_name, folder_path=[plot_folder])
         return fig
     
-    def make_connectivity_plots(self, plot_name="", plot_folder="", fig_size=(1.5,1.5)):
+    def make_connectivity_plots(self, plot_name="", plot_folder="", fig_size=(1.5,1.5),
+                                save_figure=True):
         """Plots the connectivity matrices.
 
         Parameters
@@ -580,6 +581,8 @@ class ConnectionMap:
             The folder to save the figures to. The default is "".
         fig_size : tuple, optional
             The size of the figure. The default is (1.5,1.5).
+        save_figure : bool, optional
+            Whether to save the weight map.
         """
         self.plot_connectivity(self.syn_map, \
                         plot_name=f"{plot_name} Synaptic Connections",
@@ -590,12 +593,13 @@ class ConnectionMap:
                         plot_name=f"{plot_name} Synaptic Weights",
                         plot_folder=plot_folder,
                         fig_size=fig_size, save_figure=False)
-        self.plot_connectivity(self.weight_map_min_3, \
+        self.plot_connectivity(self.weight_map_minimized, \
                         plot_name=f"{plot_name} Synaptic Weights Min 3",
                         plot_folder=plot_folder,
-                        fig_size=fig_size, save_figure=True)
+                        fig_size=fig_size, save_figure=save_figure)
     
-    def make_type_plots(self, plot_name="", plot_folder="", fig_size=(1.5,1.5)): 
+    def make_type_plots(self, plot_name="", plot_folder="", fig_size=(1.5,1.5),
+                        save_figure=True): 
         """Plots the neuron type connectivity matrices.
 
         Parameters
@@ -606,11 +610,13 @@ class ConnectionMap:
             The folder to save the figures to. The default is "".
         fig_size : tuple, optional
             The size of the figure. The default is (1.5,1.5).
+        save_figure : bool, optional
+            Whether to save the type weight map.
         """
         self.plot_type_connectivity(self.type_map, \
                         plot_name=f"{plot_name} Type Connections",
                         plot_folder=plot_folder,
-                        fig_size=fig_size, save_figure=False)
+                        fig_size=fig_size, save_figure=save_figure)
         self.plot_type_connectivity(self.type_weight_map, \
                         plot_name=f"{plot_name} Type Weights",
                         plot_folder=plot_folder,
@@ -639,7 +645,7 @@ class ConnectionMap:
         file_path = os.path.join(absolute_path, relative_path)
         sheet_dict = {"Connections": self.syn_map, 
                       "Weights": self.weight_map, 
-                      "Weights Minimized": self.weight_map_min_3, 
+                      "Weights Minimized": self.weight_map_minimized, 
                       "Types": self.type_map, \
                        "Type Weights": self.type_weight_map}
         with pd.ExcelWriter(file_path) as writer:
@@ -661,7 +667,7 @@ def syn_header(types):
     Parameters
     ----------
     types: list-like
-        A list of types in neur_coords
+        A list of types in neur_coords.
         
     Returns
     -------

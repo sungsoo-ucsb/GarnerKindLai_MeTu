@@ -42,20 +42,6 @@ import flycode.reduction as reduction
 import flycode.flywire_functions as fw
 
 
-mt1_l = ["MeTu1_L"]
-mt1_r = ["MeTu1_R"]
-mt2_l = ["MeTu2a_L", "MeTu2b_L"]
-mt2_r = ["MeTu2a_R", "MeTu2b_R"]
-mt3_l = ["MeTu3a_L", "MeTu3b_L", "MeTu3c_L"]
-mt3_r = ["MeTu3a_R", "MeTu3b_R", "MeTu3c_R"]
-mt4_l = ["MeTu4a_L", "MeTu4b_L", "MeTu4c_L", "MeTu4d_L"]
-mt4_r = ["MeTu4a_R", "MeTu4b_R", "MeTu4c_R", "MeTu4d_R"]
-mt_l_general = ["MeTu1_L", "MeTu2_L", "MeTu3_L", "MeTu4_L"]
-mt_r_general = ["MeTu1_R", "MeTu2_R", "MeTu3_R", "MeTu4_R"]
-mt_l = mt1_l + mt2_l + mt3_l + mt4_l
-mt_r = mt1_r + mt2_r + mt3_r + mt4_r
-
-
 def find_undone_input(min_syns=4):
     """Uses MeTu input table and finds which neurons have not been classified based
         on the minimum number of synapses.
@@ -195,7 +181,8 @@ def check_duplicates():
     """
     neur_file = readfiles.import_file("Neuron Spreadsheet")
     types = np.unique(np.array(neur_file["Type"], dtype=str))
-    mapping.add_types(types)
+    types = list(filter(lambda x: x in mapping.neur_coords, types))
+    mapping.add_types(types, output=False)
     for i in types:
         if not i in mapping.neur_ids:
             continue

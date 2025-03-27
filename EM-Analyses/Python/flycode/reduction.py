@@ -143,10 +143,10 @@ def remove_min_synapses(df, min_syns=1, pre_or_post="post"):
     df : pd.DataFrame
         A synapse dataframe given by flywire.get_synapses(ID).
     min_syns : int
-        The minimum number of synapses that a connected neuron should have to 
+        The minimum number of synapses that a desired neuron should have to 
         be part of the df.
     pre_or_post : str
-        "pre" or "post". Whether connected IDs are presynaptic or postsynaptic.
+        "pre" or "post". Whether desired IDs are presynaptic or postsynaptic.
     
     Returns
     -------
@@ -154,6 +154,8 @@ def remove_min_synapses(df, min_syns=1, pre_or_post="post"):
         The same dataframe with only partners that have greater than 
         minimum_syns connections.
     """
+    if min_syns==1:
+        return df
     opposite = "pre" if pre_or_post=="post" else "post"
     partners = np.unique(np.array(df[opposite]))
     relevant_partners = []
