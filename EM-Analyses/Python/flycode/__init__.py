@@ -6,9 +6,11 @@ Created on Thu Dec  8 14:00:26 2022
 """
 
 from fafbseg import flywire
+import flycode.neuprint_reading as neuread
 
 
 flywire.set_default_dataset("production")
+neuread.initialize_client()
 
 
 """

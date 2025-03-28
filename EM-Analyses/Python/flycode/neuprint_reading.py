@@ -26,57 +26,57 @@ import flycode.readfiles as readfiles
 import flycode.utils as utils
 import flycode.figures as figures
 
-
-output_notebook()
-c = Client('neuprint.janelia.org',
-           dataset='hemibrain:v1.2.1', \
-           token="eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6ImR1c3Rpbm"\
-                 "dhcm5lcjY0QGdtYWlsLmNvbSIsImxldmVsIjoibm9hdXRoIiwiaW1hZ2Utd"\
-                 "XJsIjoiaHR0cHM6Ly9saDMuZ29vZ2xldXNlcmNvbnRlbnQuY29tL2EvQUFU"\
-                 "WEFKdzdLWHBiblkyb0VyNTJuVHhael9QWkFDZndZa3EzbzZwekVmbm09czk"\
-                 "2LWM_c3o9NTA_c3o9NTAiLCJleHAiOjE4MjM4NDIyNTh9.klIdAPp7VE4nU"\
-                 "X0QoYQrcisGYOEwdGnsA3ZoONDLk-4")
-c.fetch_version()
-
-neuprint_neuron_dict = {}
-comparison_data = readfiles.import_file("Neuron Spreadsheet", 
-                                        sheet_name = "Comparison")
-
 class Ratio(Enum):
     METU_TO_TUBU = 1
     TUBU_TO_METU = 2
     RING_TO_TUBU = 3
     TUBU_TO_RING = 4
+
+client = None
+neuprint_neuron_dict = {}
+comparison_data = readfiles.import_file("Neuron Spreadsheet", 
+                                        sheet_name = "Comparison")
     
-ratio_pairs = {}
-ratio_pairs[Ratio.RING_TO_TUBU] = [["TuBu01", "ER4m"], ["TuBu02", "ER3a_ad"], 
+ratio_pairs = {Ratio.RING_TO_TUBU: [["TuBu01", "ER4m"], ["TuBu02", "ER3a_ad"], 
                                     ["TuBu02", "ER3m"], ["TuBu03", "ER3d_a"],
                                     ["TuBu03", "ER3d_c"], ["TuBu03", "ER3d_d"],
                                     ["TuBu04", "ER3d_b"], ["TuBu05", "ER3p_ab"], 
                                     ["TuBu06", "ER5"], ["TuBu07", "ER3w_ab"], 
                                     ["TuBu08", "ER4d"], ["TuBu09", "ER2_ad"], 
-                                    ["TuBu09", "ER2_b"], ["TuBu10", "ER2_c"]]
+                                    ["TuBu09", "ER2_b"], ["TuBu10", "ER2_c"]],
+                Ratio.TUBU_TO_METU: [["MeTu1", "TuBu08"], ["MeTu2a", "TuBu01"], 
+                                    ["MeTu2a", "TuBu01"],["MeTu2b", "TuBu06"], 
+                                    ["MeTu3ab", "TuBu07"], ["MeTu3c", "TuBu09"],
+                                    ["MeTu3c", "TuBu10"], ["MeTu4a", "TuBu03"], 
+                                    ["MeTu4a", "TuBu04"], ["MeTu4b", "TuBu02"], 
+                                    ["MeTu4c", "TuBu05"], ["MeTu4d", "TuBu02"],
+                                    ["MeTu4d", "TuBu05"]]}
 ratio_pairs[Ratio.TUBU_TO_RING] = [[x[1], x[0]] for x in 
                                    ratio_pairs[Ratio.RING_TO_TUBU]]
-ratio_pairs[Ratio.TUBU_TO_METU] = [["MeTu1", "TuBu08"], ["MeTu2a", "TuBu01"], 
-                                   ["MeTu2a", "TuBu01"],["MeTu2b", "TuBu06"], 
-                                   ["MeTu3ab", "TuBu07"], ["MeTu3c", "TuBu09"],
-                                   ["MeTu3c", "TuBu10"], ["MeTu4a", "TuBu03"], 
-                                   ["MeTu4a", "TuBu04"], ["MeTu4b", "TuBu02"], 
-                                   ["MeTu4c", "TuBu05"], ["MeTu4d", "TuBu02"],
-                                   ["MeTu4d", "TuBu05"]]
 ratio_pairs[Ratio.METU_TO_TUBU] = [[x[1], x[0]] for x in 
                                    ratio_pairs[Ratio.TUBU_TO_METU]]
 
 
 """
-add_types(["MC61", "MC64", "TuBu01", "TuBu02", "TuBu03", "TuBu04", "TuBu05", 
+neuread.add_types(["MC61", "MC64", "TuBu01", "TuBu02", "TuBu03", "TuBu04", "TuBu05", 
            "TuBu06", "TuBu07", "TuBu08", "TuBu09", "TuBu10"])
-neuread.neur_to_type(["MC61", "MC64"], 
+neuread.get_connections(["MC61", "MC64"], 
                      ["TuBu08", "TuBu01", "TuBu06", "TuBu07", "TuBu09", 
-                      "TuBu10", "TuBu02", "TuBu03", "TuBu04", "TuBu05"], 
-                     file_name="MeTu to TuBu Neuprint")
+                      "TuBu10", "TuBu02", "TuBu03", "TuBu04", "TuBu05"])
 """
+
+
+def initialize_client():
+    """
+    Initializes the Neuprint client if it has not been previously.
+    """
+    global client
+    if client is not None:
+        return
+    output_notebook()
+    token = readfiles.import_file('NeuprintToken', file_type='txt')
+    client = Client('neuprint.janelia.org', dataset='hemibrain:v1.2.1', \
+            token=token)
 
 
 def add_types(types):
@@ -87,6 +87,7 @@ def add_types(types):
     types : list-like
         List of Neuprint types to add to neuron_dict.
     """
+    initialize_client()
     for i in types:
         if i in neuprint_neuron_dict:
             continue
@@ -94,9 +95,9 @@ def add_types(types):
         neuprint_neuron_dict[i] = np.array(neuron_df["bodyId"], dtype=np.uint64)
 
 
-def neur_to_type(pre_types, post_types, file_name="Neuprint Sum Array"):
+def get_connections(pre_types, post_types):
     """Finds the sum of all post connections of given post types to individual
-        pre neurons. Then exports to excel.
+        pre neurons.
     
     Parameters
     ----------
@@ -104,8 +105,6 @@ def neur_to_type(pre_types, post_types, file_name="Neuprint Sum Array"):
         A list of pre_types.
     post_types : list-like
         A list of post_types.
-    file_name : str, optional
-        The name of the output excel file. The default is "Neuprint Sum Array".
     
     Returns
     -------
@@ -137,7 +136,6 @@ def neur_to_type(pre_types, post_types, file_name="Neuprint Sum Array"):
             syn_count = str(temp_df2["weight"].sum())
             syn_dict[i] = np.append(syn_dict[i], str(syn_count))
     syn_df = pd.DataFrame(syn_dict)
-    utils.write_excel(syn_df, file_name=file_name)
     return syn_df
 
 
@@ -146,12 +144,13 @@ def hemi_syn_counts(types, region, outliers=[], y_axis="Synapse Count"):
 
     Parameters
     ----------
-    types : TYPE
-        DESCRIPTION.
-    region : TYPE
-        DESCRIPTION.
-    outliers : TYPE, optional
-        DESCRIPTION. The default is [].
+    types : list-like
+        A list of Neuprint neuron types..
+    region : str
+        A Neuprint region.
+    outliers : list-like, optional
+        Outliers, any IDs included will have 0 connections in the output. 
+        The default is [].
     y_axis : TYPE, optional
         DESCRIPTION. The default is "Synapse Count".
 
@@ -161,6 +160,7 @@ def hemi_syn_counts(types, region, outliers=[], y_axis="Synapse Count"):
         A df-ready dict that contains each neuron in types and its number
         of synapses within region.
     """
+    initialize_client()
     neuprint_data = readfiles.import_neuprint_data()
     neur_data = neuprint_data[neuprint_data["Generalized Type"].isin(types)]
     neur_data["Identifier"] = np.array(neur_data["Identifier"], dtype=np.int64)
@@ -217,6 +217,7 @@ def lobula_counts(just_metu4, plot_name="", plot_folder="", save_figure=True):
     -------
     df : pd.DataFrame
     """
+    initialize_client()
     neu_data = readfiles.import_neuprint_data()
     mt_data = neu_data[neu_data["Broad Type"]=="MeTu4"] if just_metu4\
                                        else neu_data[neu_data["Class"]=="MeTu"]
