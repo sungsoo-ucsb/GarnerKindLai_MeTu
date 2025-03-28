@@ -41,12 +41,15 @@ def import_file(file_name, sheet_name=0, usecols=None,
     file_path = os.path.join(absolute_path, "Readable", relative_path)
     
     if file_type == "xlsx":
-        file = pd.read_excel(file_path, sheet_name = sheet_name, 
-                             usecols = usecols, dtype=dtype)
+        file = pd.read_excel(file_path, sheet_name=sheet_name, 
+                             usecols=usecols, dtype=dtype)
     elif file_type == "csv":
         file = pd.read_csv(file_path, dtype=dtype)
     elif file_type == "feather":
         file = pd.read_feather(file_path)
+    elif file_type == "txt":
+        with open(file_path) as f:
+            file = f.read()
     return file
 
 
@@ -189,12 +192,6 @@ def import_colors():
         new_colors[i] = ListedColormap(np.array(import_file("Colors", \
                 sheet_name = i, usecols = ["R", "G", "B", "A"])))
     return new_colors
-
-
-
-
-
-
 
 
 
