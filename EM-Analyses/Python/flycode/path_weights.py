@@ -67,26 +67,6 @@ def get_cx_df(full_df=pd.DataFrame()):
     return cx_df
 
 
-def get_layer2_df(full_df):
-    """Gets a dataframe with all synapses in which Layer2 neurons are 
-    postsynaptic.
-
-    Parameters
-    ----------
-    full_df : pd.DataFrame
-        The dataframe retrieved from get_full_df().
-
-    Returns
-    -------
-    layer2_df : pd.DataFrame
-        A dataframe with Layer2 postsynapses.
-    """
-    layer2 = layer2 = np.asarray(readfiles.import_file("CX_Neurons", 
-                                                       sheet_name="Layer2").root_id)
-    layer2_df = full_df[full_df.post.isin(layer2)]
-    return layer2_df
-
-
 def get_layer2(neur, cx_df, min_weight=0.01):
     """Gets all of the relevant presynaptic neurons from a CX neuron.
 
@@ -119,6 +99,26 @@ def get_layer2(neur, cx_df, min_weight=0.01):
         weight_dict[i] = temp_weight
     weight_dict = dict(sorted(weight_dict.items(), key=lambda x: x[1], reverse=True))
     return weight_dict
+
+
+def get_layer2_df(full_df):
+    """Gets a dataframe with all synapses in which Layer2 neurons are 
+    postsynaptic.
+
+    Parameters
+    ----------
+    full_df : pd.DataFrame
+        The dataframe retrieved from get_full_df().
+
+    Returns
+    -------
+    layer2_df : pd.DataFrame
+        A dataframe with Layer2 postsynapses.
+    """
+    layer2 = layer2 = np.asarray(readfiles.import_file("CX_Neurons", 
+                                                       sheet_name="Layer2").root_id)
+    layer2_df = full_df[full_df.post.isin(layer2)]
+    return layer2_df
 
 
 def get_layer3(neur, layer2_df, min_weight=0.01):
@@ -259,208 +259,6 @@ def make_weight_strip_plot(plot_name="", plot_folder="", save_figure=True):
     return weight_df
     
     
-def make_whisker_plot(plot_name="", plot_folder="", save_figure=True):
-    """Makes a box plot and strip plot that contains the optic lobe weights of
-    AVP ring neurons, non-AVP ring neurons, and other CX neurons.
-
-    Parameters
-    ----------
-    plot_name : str, optional
-        The name of the figure to be saved. The default is "".
-    plot_folder : str, optional
-        The folder in which to save the figure. The default is "".
-    save_figure : bool, optional
-        Whether to save the figure. The default is True.
-    """
-    weight_df = readfiles.import_file("CX_Neurons", sheet_name = "CX non-Interneurons")
-    fig, (ax1, ax2) = plt.subplots(1, 2, figsize=(5.0, 2.5))
-    x_label = "Neuron Class"
-    y_label = "Optic Lobe Weight"
-    general_types = ["AVP Neurons to EB", "Non-AVP Neurons to EB", "Other CX Neurons"]
-    
-    plt.sca(ax1)
-    data = [np.asarray(weight_df[weight_df.general_type==x].total_weight) \
-                    for x in general_types]
-    width_prop = {'linewidth': 0.3}
-    bplot = plt.boxplot(data,
-                        vert=True,
-                        patch_artist=True,
-                        flierprops={'marker': '_',
-                                    'markersize': 3,
-                                    'markeredgewidth': 0.3},
-                        boxprops= width_prop,
-                        medianprops=width_prop,
-                        whiskerprops=width_prop,
-                        capprops=width_prop)
-    palette = ["#4400dd", "#e6194B", "#EBC400"]
-    for patch, color in zip(bplot['boxes'], palette):
-        patch.set_facecolor(color)
-    for median in bplot['medians']:
-        median.set_color('black')
-    
-    weight_df.rename(columns={"general_type": "Neuron Class",
-                              "total_weight": "Optic Lobe Weight"},
-                     inplace=True)
-    plt.sca(ax2)
-    strip = sns.stripplot(data=weight_df,
-                          x=x_label, 
-                          y=y_label, 
-                          hue=None, 
-                          order=general_types,
-                          palette=palette,
-                          dodge=False,
-                          size=2.5)
-    plt.xlabel(x_label,
-               fontsize=figures.font_size)
-    plt.ylabel(y_label,
-               fontsize=figures.font_size)
-    plt.xticks(rotation=figures.xtick_rotation,
-               ha=figures.ha,
-               rotation_mode=figures.rotation_mode,
-               fontsize=figures.font_size)
-    plt.yticks(fontsize=figures.font_size)
-    sns.boxplot(showmeans=True,
-                meanprops={"markerfacecolor": "k",
-                           "markeredgecolor": "k",
-                           "marker": "_",
-                           "markersize": 4},
-                medianprops={'visible': False},
-                whiskerprops={'visible': False},
-                zorder=10,
-                x=x_label,
-                y=y_label,
-                data=weight_df,
-                showfliers=False,
-                showbox=False,
-                showcaps=False,
-                ax=strip)
-    if save_figure:
-        figures.save_fig(plt,
-                         plot_name=plot_name,
-                         folder_path=[plot_folder])
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-
-
-
-def test():
-    """Gets a dataframe with all synapses in which CX non-interneurons are
-    postsynaptic and the synapses are not within the CX itself (exempting TuBu
-    presynapses, which are sometimes labeled as located within the CX while 
-    they are really in the bulb).
-
-    Parameters
-    ----------
-    full_df : pd.DataFrame
-        The dataframe retrieved from get_full_df().
-
-    Returns
-    -------
-    cx_df : pd.DataFrame
-        A dataframe with CX neuron postsynapses.
-
-    """
-    seen_neurs = np.array([], dtype=np.int64)
-    full_df = get_full_df()
-    info_df = readfiles.import_file("CX_Neurons", sheet_name="CX non-Interneurons")
-    cx_neurs = np.asarray(info_df.root_id)
-    cx_df = get_cx_df(full_df)
-    cx_df = cx_df[~(cx_df.pre.isin(cx_neurs))]
-    seen_neurs = np.concatenate((seen_neurs, cx_neurs))
-    layer2 = np.unique(cx_df.pre)
-    layer2_df = full_df[full_df.post.isin(layer2)]
-    layer2_df = layer2_df[~(layer2_df.pre.isin(seen_neurs))]
-    #return layer2_df
-    layer2_df = reduction.remove_min_synapses(layer2_df, min_syns=5, pre_or_post="post")
-    layer2_df = reduction.remove_min_synapses(layer2_df, min_syns=5, pre_or_post="pre")
-    seen_neurs = np.concatenate((seen_neurs, layer2))
-    layer3 = np.unique(layer2_df.pre)
-    layer3_df = full_df[full_df.post.isin(layer3)]
-    layer3_df = layer3_df[~(layer3_df.pre.isin(seen_neurs))]
-    halt = mapping.ids_from_types(['Haltere_R'])
-    layer3_df = layer3_df[layer3_df.pre.isin(halt)]
-    layer3_df = reduction.remove_min_synapses(layer3_df, min_syns=5, pre_or_post="post")
-    layer3_df = reduction.remove_min_synapses(layer3_df, min_syns=5, pre_or_post="pre")
-    return layer3_df
-
-
-def get_pre_spread():
-    conn_map = mapping.ConnectionMap(['Haltere_R'], ['Halt_Path_Layer_3_R'], 'Connectome')
-
-
-
-def get_dng_weights(full_df = pd.DataFrame()):
-    if full_df.empty:
-        full_df = get_full_df()
-    dng_types = [f'DNg02_{x}_{y}' for x in 'abcdefg' for y in 'LR']
-    layer3_types = ['Optic Lobe', 'PFL1', 'PFL3']
-    dng = mapping.ids_from_types(dng_types)
-    pfl1 = mapping.ids_from_types([f'PFL1_{x}' for x in 'LR'])
-    pfl3 = mapping.ids_from_types([f'PFL3_{x}' for x in 'LR'])
-    layer2_optic = np.asarray(readfiles.import_file('DNg_Neurons', 
-                                         sheet_name='layer2_optic').root_id)
-    layer3_optic = np.asarray(readfiles.import_file('DNg_Neurons', 
-                                         sheet_name='layer3_optic').root_id)
-    weights = {x: [0, 0, 0] for x in dng}
-    dng_df = full_df[full_df.post.isin(dng)]
-    full_layer2 = np.unique(dng_df.pre)
-    full_layer2_df = full_df[full_df.post.isin(full_layer2)]
-    for i in dng:
-        temp_df = dng_df[dng_df.post==i]
-        layer2 = np.unique(temp_df.pre)
-        layer2_df = full_layer2_df[full_layer2_df.post.isin(layer2)]
-        for j in layer2:
-            temp_df2 = temp_df[temp_df.pre==j]
-            weight1 = len(temp_df2)/len(temp_df)
-            temp_layer2_df = layer2_df[layer2_df.post==j]
-            seen_optic = False
-            if j in layer2_optic:
-                weights[i][0] += weight1
-                seen_optic = True
-            if len(temp_layer2_df)==0:
-                continue
-            for k in range(3):
-                if k==0 and seen_optic:
-                    continue
-                layer3 = [layer3_optic, pfl1, pfl3][k]
-                temp_layer2_df2 = temp_layer2_df[temp_layer2_df.pre.isin(layer3)]
-                weight2 = len(temp_layer2_df2)/len(temp_layer2_df)
-                weights[i][k] += weight2 * weight1
-    weight_map = {x: [] for x in ['neur_type', 'root_id', 'weight', 'input_type']}
-    for i in dng_types:
-         for j in mapping.ids_from_types([i]):
-             for k in range(3):
-                 weight_map['neur_type'].append(i[:-2])
-                 weight_map['root_id'].append(j)
-                 weight_map['weight'].append(weights[j][k])
-                 weight_map['input_type'].append(layer3_types[k])
-    weight_df = pd.DataFrame(weight_map)
-    return weight_df
-    
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 
