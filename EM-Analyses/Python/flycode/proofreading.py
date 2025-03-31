@@ -78,12 +78,12 @@ def individual_change_logs(ids):
     return proof_dict
 
 
-def condense_change_log(change_log):
+def condense_change_log(change_logs):
     """Condenses a dictionary of change dfs into a single change df.
     
     Parameters
     ----------
-    change_log : dict
+    change_logs : dict
         A log of changes retrieved from client.chunkedgraph.get_tabular_change_log()
 
     Returns
@@ -92,7 +92,7 @@ def condense_change_log(change_log):
         The change_log condensed into a single dataframe.
 
     """
-    change_df = pd.concat([change_log[x] for x in change_log])
+    change_df = pd.concat([change_logs[x] for x in change_logs])
     return change_df
 
 
@@ -113,7 +113,7 @@ def full_proof_table(ids):
     return condense_change_log(proof_dict)
 
 
-def proof_types(types):
+def proof_types(neur_types):
     """Returned a change log table based on neuron types.
 
     Parameters
@@ -126,9 +126,9 @@ def proof_types(types):
     full_df : pd.DataFrame
         df of all edits of the neurons.
     """
-    mapping.add_types(types)
+    mapping.add_types(neur_types)
     full_df = empty_change_df()
-    for i in types:
+    for i in neur_types:
         full_df = pd.concat([full_df, full_proof_table(mapping.neur_ids[i])])
     return full_df
 
@@ -165,12 +165,12 @@ def proof_counts(full_df):
     return proof_df
 
 
-def proof_counts_types(types):
+def proof_counts_types(neur_types):
     """Runs proof_counts() based on neuron types.
 
     Parameters
     ----------
-    types : list-like
+    neur_types : list-like
         A list of neuron types in Neuron Spreadsheet.
 
     Returns
@@ -178,61 +178,9 @@ def proof_counts_types(types):
     pd.DataFrame
         Dataframe with the edit counts of each person.
     """
-    full_df = proof_types(types)
+    full_df = proof_types(neur_types)
     return proof_counts(full_df)
-        
 
-def full_percent_spread(neur_types):
-    """Shows how much each lab contributed to certain neurons.
-    
-    Parameters
-    ----------
-    neur_types : list-like
-        A list of neuron types that are in mapping.neur_coords
-
-    Returns
-    -------
-    edit_df : pd.DataFrame
-        Breaks down how much each lab contributed to editing each neuron out
-        of neur_types, assuming they contributed >=0.1 of the edits.
-    """
-    all_ids = mapping.ids_from_types(neur_types)
-    edit_dict = {"id": np.array([], dtype=str),
-                 "neuron_type": np.array([], dtype=str),
-                 "total_edit_count": np.array([], dtype=int),
-                 "lab": np.array([], dtype=str),
-                 "lab_edit_count": np.array([], dtype=int),
-                 "lab_percent_edited": np.array([], dtype=float)}
-    counter = 0
-    for i in all_ids:
-        if counter % 40 == 0:
-            print(f"{counter} completed")
-        counter += 1
-        temp_df = get_change_log([i])[i]
-        if len(temp_df)==0:
-            continue
-        current_type = mapping.find_neur_type(i)
-        temp_df.replace("Mathias Wernet lab", "Mathias Wernet Lab")
-        temp_df.replace("Greg Jefferis lab", "Greg Jefferis Lab")
-        labs = np.unique(temp_df["user_affiliation"])
-        total_edits = len(temp_df)
-        for j in labs:
-            temp_df2 = temp_df[temp_df["user_affiliation"]==j]
-            if len(temp_df2) < (total_edits/10):
-                continue
-            edit_dict["id"] = np.append(edit_dict["id"], str(i))
-            edit_dict["neuron_type"] = np.append(\
-                    edit_dict["neuron_type"], current_type)
-            edit_dict["total_edit_count"] = np.append(\
-                    edit_dict["total_edit_count"], total_edits)
-            edit_dict["lab"] = np.append(edit_dict["lab"], j)
-            edit_dict["lab_edit_count"] = np.append(\
-                    edit_dict["lab_edit_count"], len(temp_df2))
-            edit_dict["lab_percent_edited"] = np.append(\
-                    edit_dict["lab_percent_edited"], len(temp_df2)/total_edits)
-    edit_df = pd.DataFrame(edit_dict)
-    return edit_df
-    
 
 def neuron_counts(neur_types):
     """Shows the total edits each person performed on each neuron.
@@ -288,13 +236,65 @@ def neuron_counts(neur_types):
     return user_df
 
 
-def all_codex_names(neur_types, keep_our_names = True):
+def full_percent_spread(neur_types):
+    """Shows how much each lab contributed to certain neurons.
+    
+    Parameters
+    ----------
+    neur_types : list-like
+        A list of neuron types that are in mapping.neur_coords
+
+    Returns
+    -------
+    edit_df : pd.DataFrame
+        Breaks down how much each lab contributed to editing each neuron out
+        of neur_types, assuming they contributed >=0.1 of the edits.
+    """
+    all_ids = mapping.ids_from_types(neur_types)
+    edit_dict = {"id": np.array([], dtype=str),
+                 "neuron_type": np.array([], dtype=str),
+                 "total_edit_count": np.array([], dtype=int),
+                 "lab": np.array([], dtype=str),
+                 "lab_edit_count": np.array([], dtype=int),
+                 "lab_percent_edited": np.array([], dtype=float)}
+    counter = 0
+    for i in all_ids:
+        if counter % 40 == 0:
+            print(f"{counter} completed")
+        counter += 1
+        temp_df = get_change_log([i])[i]
+        if len(temp_df)==0:
+            continue
+        current_type = mapping.find_neur_type(i)
+        temp_df.replace("Mathias Wernet lab", "Mathias Wernet Lab")
+        temp_df.replace("Greg Jefferis lab", "Greg Jefferis Lab")
+        labs = np.unique(temp_df["user_affiliation"])
+        total_edits = len(temp_df)
+        for j in labs:
+            temp_df2 = temp_df[temp_df["user_affiliation"]==j]
+            if len(temp_df2) < (total_edits/10):
+                continue
+            edit_dict["id"] = np.append(edit_dict["id"], str(i))
+            edit_dict["neuron_type"] = np.append(\
+                    edit_dict["neuron_type"], current_type)
+            edit_dict["total_edit_count"] = np.append(\
+                    edit_dict["total_edit_count"], total_edits)
+            edit_dict["lab"] = np.append(edit_dict["lab"], j)
+            edit_dict["lab_edit_count"] = np.append(\
+                    edit_dict["lab_edit_count"], len(temp_df2))
+            edit_dict["lab_percent_edited"] = np.append(\
+                    edit_dict["lab_percent_edited"], len(temp_df2)/total_edits)
+    edit_df = pd.DataFrame(edit_dict)
+    return edit_df
+    
+
+def all_codex_names(neur_types, keep_our_names=True):
     """Makes a spreadsheet of all relevant named neurons in Codex.
 
     Parameters
     ----------
     neur_types : list-like
-        The types to include in the spreadsheet..
+        The types to include in the spreadsheet.
     keep_our_names : bool, optional
         Whether to keep the names of people in Kim and Wernet Labs. The default 
         is True.

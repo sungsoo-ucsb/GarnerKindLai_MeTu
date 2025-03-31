@@ -16,12 +16,12 @@ import flycode.utils as utils
 
 def import_file(file_name, sheet_name=0, usecols=None, 
                 file_type="xlsx", dtype=None):
-    """Imports a file from the Readable folder as a pandas DataFrame.
+    """Imports a file from the Readable folder.
 
     Parameters
     ----------
     file_name : str
-        The name of the file in Readable (excluding .xlsx)
+        The name of the file in Readable (do not include the file extension).
     sheet_name : str or int
         Optional, the sheet name.
     usecols : str, list-like
@@ -33,8 +33,8 @@ def import_file(file_name, sheet_name=0, usecols=None,
 
     Returns
     -------
-    file : pd.DataFrame
-        The file as a pandas DataFrame.
+    file : pd.DataFrame, str
+        The file as a pandas DataFrame or str when file_type is "txt".
     """
     absolute_path = os.path.dirname(__file__)
     relative_path = f"{file_name}.{file_type}"
@@ -125,13 +125,16 @@ def import_regions():
     
     
 def import_coords():
-    """Imports the coordinates from Neuron Spreadsheet.
+    """Imports the coordinates and previous IDs from Neuron Spreadsheet.
     
     Returns
     -------
     neur_types : Dictionary
         Keys are neuron types from Neuron Spreadsheet and values are lists of
         coordinates of those types.
+    prev_ids : Dictionary
+        Keys are neuron types from Neuron Spreadsheet and values are lists of
+        previously recorded IDs of those types.
     """
     neur_file = import_file("Neuron Spreadsheet", sheet_name="Neurons")
     neur_types = {}
@@ -190,7 +193,7 @@ def import_colors():
               "RegionSolidGray"]
     for i in colors:
         new_colors[i] = ListedColormap(np.array(import_file("Colors", \
-                sheet_name = i, usecols = ["R", "G", "B", "A"])))
+                sheet_name=i, usecols=["R", "G", "B", "A"])))
     return new_colors
 
 
