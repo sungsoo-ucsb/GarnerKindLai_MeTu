@@ -15,109 +15,6 @@ import flycode.readfiles as readfiles
 region_dict = readfiles.import_regions()
 
 
-def lim_region(df, region, coord_names=[f"post_{x}" for x in "xyz"]):
-    """Limits a synapse dataframe to a given region (via lim_vol()).
-    
-    Parameters
-    ----------
-    df : pd.DataFrame
-        A synapse dataframe given by flywire.get_synapses(ID).
-    region : str
-        A region in region_dict.
-    coord_names : list-like
-        The names of the x, y, and z coordinate columns in the dataframe to be
-        passed into lim_vol().
-    
-    Returns
-    -------
-    df : pd.DataFrame
-        The same dataframe limited to the given region.
-    """
-    if not region in region_dict:
-        print("Region not valid")
-        return df
-    return lim_vol(df, 
-                   include=region_dict[region]["include"],
-                   exclude=region_dict[region]["exclude"],
-                   coord_names=coord_names)
-        
-    
-def remove_region(df, region, coord_names=[f"post_{x}" for x in "xyz"]):
-    """Removes a certain region from a synapse dataframe.
-    
-    Parameters
-    ----------
-    df : pd.DataFrame
-        A synapse dataframe given by flywire.get_synapses(ID).
-    region : str
-        A region in region_dict.
-    coord_names : list-like
-        The names of the x, y, and z coordinate columns in the dataframe to be
-        passed into lim_vol().
-    
-    Returns
-    -------
-    df : pd.DataFrame
-        The same dataframe with the given region removed.
-    """
-    if not region in region_dict:
-        print("Region not valid")
-        return df
-    return lim_vol(df, 
-                   include=region_dict["Connectome"]["include"],
-                   exclude=region_dict[region]["include"],
-                   coord_names=coord_names)
-    
-
-def lim_vol(df, include=np.array([]), exclude=np.array([]), 
-            coord_names = [f"post_{x}" for x in "xyz"]):
-    """Takes in a synapse dataframe and returns one with synapses limited to a 
-       specified volume.
-    
-    Parameters
-    ----------
-    df : pd.DataFrame
-        A synapse dataframe given by flywire.get_synapses(ID)
-    include : np.array
-        The volume you would like to limit the synapses to (nm). A two-dimensional 
-        array that contains coordinates that are on the outer bounds of the volume. 
-        For instance if you would like to limit the synapses to be contained within
-        a specific tetrahedron, this parameters would be 
-        np.array([[x1,y1,z1],[x2,y2,z2],[x3,y3,z3],[x4,y4,z4]])
-    exclude : np.array
-        This is a volume you would like the dataframe to exclude (nm). 
-    coord_names : list-like
-        The names of the x, y, and z coordinate columns in the dataframe.
-    
-    Returns
-    -------
-    df : pd.DataFrame
-        The same dataframe limited to synapses within include, exempting those 
-        within exclude.
-    """
-    if len(coord_names)!=3:
-        raise ValueError("coord_names must be of length 3.")
-        
-    out_of_bounds_simplex = Delaunay(\
-                        points=np.array([[0,0,0], [0,0,1], [0,1,0], [1,0,0]]))
-    
-    include = Delaunay(points=include) if include.size!=0 \
-            else out_of_bounds_simplex
-    exclude = Delaunay(points=exclude) if exclude.size!=0 \
-            else out_of_bounds_simplex
-    df_limiter = pd.Series(np.zeros((len(df)), dtype=bool), index=df.index)
-    
-    x, y, z = coord_names
-    for idx, x_c, y_c, z_c in zip(df_limiter.index, df[x], df[y], df[z]):
-        temp_coord = np.array([x_c//4, y_c//4, z_c//40])
-        if include.find_simplex(temp_coord)!=-1 and \
-                exclude.find_simplex(temp_coord)==-1:
-            df_limiter[idx] = True
-
-    df_limed = df[df_limiter]
-    return df_limed
-
-
 def remove_autapses(df):
     """Takes in a synapse df and removes all autapses.
     
@@ -200,6 +97,109 @@ def remove_min_weight(df, min_weight=0.05, pre_or_post="post"):
     return lim_df
 
 
+def lim_vol(df, include=np.array([]), exclude=np.array([]), 
+            coord_names=[f"post_{x}" for x in "xyz"]):
+    """Takes in a synapse dataframe and returns one with synapses limited to a 
+       specified volume.
+    
+    Parameters
+    ----------
+    df : pd.DataFrame
+        A synapse dataframe given by flywire.get_synapses(ID)
+    include : np.array
+        The volume you would like to limit the synapses to (nm). A two-dimensional 
+        array that contains coordinates that are on the outer bounds of the volume. 
+        For instance if you would like to limit the synapses to be contained within
+        a specific tetrahedron, this parameters would be 
+        np.array([[x1,y1,z1],[x2,y2,z2],[x3,y3,z3],[x4,y4,z4]])
+    exclude : np.array
+        This is a volume you would like the dataframe to exclude (nm). 
+    coord_names : list-like
+        The names of the x, y, and z coordinate columns in the dataframe.
+    
+    Returns
+    -------
+    df : pd.DataFrame
+        The same dataframe limited to synapses within include, exempting those 
+        within exclude.
+    """
+    if len(coord_names)!=3:
+        raise ValueError("coord_names must be of length 3.")
+        
+    out_of_bounds_simplex = Delaunay(\
+                        points=np.array([[0,0,0], [0,0,1], [0,1,0], [1,0,0]]))
+    
+    include = Delaunay(points=include) if include.size!=0 \
+            else out_of_bounds_simplex
+    exclude = Delaunay(points=exclude) if exclude.size!=0 \
+            else out_of_bounds_simplex
+    df_limiter = pd.Series(np.zeros((len(df)), dtype=bool), index=df.index)
+    
+    x, y, z = coord_names
+    for idx, x_c, y_c, z_c in zip(df_limiter.index, df[x], df[y], df[z]):
+        temp_coord = np.array([x_c//4, y_c//4, z_c//40])
+        if include.find_simplex(temp_coord)!=-1 and \
+                exclude.find_simplex(temp_coord)==-1:
+            df_limiter[idx] = True
+
+    df_limed = df[df_limiter]
+    return df_limed
+
+
+def lim_region(df, region, coord_names=[f"post_{x}" for x in "xyz"]):
+    """Limits a synapse dataframe to a given region (via lim_vol()).
+    
+    Parameters
+    ----------
+    df : pd.DataFrame
+        A synapse dataframe given by flywire.get_synapses(ID).
+    region : str
+        A region in region_dict.
+    coord_names : list-like
+        The names of the x, y, and z coordinate columns in the dataframe to be
+        passed into lim_vol().
+    
+    Returns
+    -------
+    df : pd.DataFrame
+        The same dataframe limited to the given region.
+    """
+    if not region in region_dict:
+        print("Region not valid")
+        return df
+    return lim_vol(df, 
+                   include=region_dict[region]["include"],
+                   exclude=region_dict[region]["exclude"],
+                   coord_names=coord_names)
+        
+    
+def remove_region(df, region, coord_names=[f"post_{x}" for x in "xyz"]):
+    """Removes a certain region from a synapse dataframe.
+    
+    Parameters
+    ----------
+    df : pd.DataFrame
+        A synapse dataframe given by flywire.get_synapses(ID).
+    region : str
+        A region in region_dict.
+    coord_names : list-like
+        The names of the x, y, and z coordinate columns in the dataframe to be
+        passed into lim_vol().
+    
+    Returns
+    -------
+    df : pd.DataFrame
+        The same dataframe with the given region removed.
+    """
+    if not region in region_dict:
+        print("Region not valid")
+        return df
+    return lim_vol(df, 
+                   include=region_dict["Connectome"]["include"],
+                   exclude=region_dict[region]["include"],
+                   coord_names=coord_names)
+    
+
 def coords_to_region(coords, region):
     """Limits an array of coords to a given region.
     
@@ -246,7 +246,7 @@ def lines_to_region(coords1, coords2, region):
     coords1 : list-like
         One set of neurons.
     coords2 : list-like
-        The other set of neurons
+        The other set of neurons.
     region : str
         Region to search through.
 

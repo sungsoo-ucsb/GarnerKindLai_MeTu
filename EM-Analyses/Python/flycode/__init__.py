@@ -10,7 +10,10 @@ import flycode.neuprint_reading as neuread
 
 
 flywire.set_default_dataset("production")
-neuread.initialize_client()
+try:
+    neuread.initialize_client()
+except:
+    print('Unable to initialize Neuprint.')
 
 
 """

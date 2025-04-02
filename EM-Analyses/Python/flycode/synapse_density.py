@@ -65,14 +65,14 @@ type_colors = {
     }
 
 
-def rotate_coord(coord, axis, angle, scale=1):
-    """Rotates the coordinate around an axis.
+def rotate_coord(coord, center, angle, scale=1):
+    """Rotates the coordinate around a center point.
     
     Parameters
     ----------
     coord : np.array
         [x,y,z] Coordinate you want rotated around the z-axis.
-    axis : np.array
+    center : np.array
         [x1,y1,z1] The point around which you want the coord rotated.
     angle : float
         The angle of the rotation (in degrees).
@@ -85,18 +85,18 @@ def rotate_coord(coord, axis, angle, scale=1):
         The rotated coord.
     """
     angle = math.radians(angle)
-    coord = np.matmul(np.array([[1,0,0,-axis[0]],
-                               [0,1,0,-axis[1]],
-                               [0,0,1,-axis[2]]]), np.append(coord, 1))
+    coord = np.matmul(np.array([[1,0,0,-center[0]],
+                               [0,1,0,-center[1]],
+                               [0,0,1,-center[2]]]), np.append(coord, 1))
     coord = np.matmul(np.array([[scale, 0, 0],
                                 [0, scale, 0],
                                 [0, 0, 1]]), coord)
     coord = np.matmul(np.array([[math.cos(angle), -math.sin(angle), 0],
                                [math.sin(angle), math.cos(angle), 0],
                                [0, 0, 1]]), coord)
-    coord = np.matmul(np.array([[1,0,0,axis[0]],
-                               [0,1,0,axis[1]],
-                               [0,0,1,axis[2]]]), np.append(coord, 1))
+    coord = np.matmul(np.array([[1,0,0,center[0]],
+                               [0,1,0,center[1]],
+                               [0,0,1,center[2]]]), np.append(coord, 1))
     return coord
     
     
@@ -202,8 +202,7 @@ def get_steps(region="AOTU_R", spacing=10):
 
 
 def make_map(df, x_steps, y_steps, z_steps, spacing, plane, vert=False,
-             reverse={True: False, False: False}, region="AOTU_R",
-             angle=30, scale=1.3):
+             region="AOTU_R", angle=30, scale=1.3):
     """Recursively makes a synapse density map given a synapse dataframe and a 
         region.
 
@@ -225,10 +224,6 @@ def make_map(df, x_steps, y_steps, z_steps, spacing, plane, vert=False,
     vert : bool, optional
         Used for recursion, should be false upon running the function. 
         The default is False.
-    reverse : dict, optional
-        Should be {True: False, False: True} if plane = "xz" due to the 
-        mirroring of the dataset. 
-        The default is {True: False, False: False}.
     region : str, optional
         The region by which the search is performed. The default is "AOTU_R".
     angle : float, optional
@@ -265,8 +260,9 @@ def make_map(df, x_steps, y_steps, z_steps, spacing, plane, vert=False,
         mid = len(directions[direct])//2
     
     temp_direct1, temp_direct2 = {}, {}
+    reverse = {True: False, False: True} if plane == 'xz' else {True: False, False: False}
     for i in "xyz":
-        if i==direct and not reverse[bool(axis)]:
+        if i==direct and not reverse[bool(axis)]: #Reversed because dataset is mirrored
             temp_direct1[i] = directions[i][:mid]
             temp_direct2[i] = directions[i][mid:]
         elif i == direct:
@@ -280,13 +276,11 @@ def make_map(df, x_steps, y_steps, z_steps, spacing, plane, vert=False,
             make_map(df=temp_df, x_steps=temp_direct1["x"], 
                      y_steps=temp_direct1["y"], z_steps=temp_direct1["z"], 
                      spacing=spacing, plane=plane, vert=not bool(axis), 
-                     reverse=reverse, region=region, angle=angle,
-                     scale=scale),
+                     region=region, angle=angle, scale=scale),
             make_map(df=temp_df, x_steps=temp_direct2["x"], 
                      y_steps=temp_direct2["y"], z_steps=temp_direct2["z"], 
                      spacing=spacing, plane=plane, vert=not bool(axis), 
-                     reverse=reverse, region=region, angle=angle,
-                     scale=scale)
+                     region=region, angle=angle, scale=scale)
             ), axis=axis)
 
 
@@ -312,7 +306,6 @@ def xz_map(df, steps, spacing, region, angle, scale):
     Uses make_map() from the xz plane point of view.
     """
     return make_map(df, steps[0], steps[1], steps[2], spacing, plane="xz",
-            reverse={True: False, False: True}, 
             region=region, angle=angle, scale=scale)
 
 

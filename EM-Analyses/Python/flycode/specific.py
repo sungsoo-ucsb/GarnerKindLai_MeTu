@@ -27,6 +27,7 @@ import flycode.figures as figures
 import flycode.flywire_functions as fw
 
 
+pie_fig_size = tuple((34*4.8)/275 for _ in range(2))
 aotu_subregions = {
         "Posterior Lateral": ["TuBu08", "MeTu1"],
         "Posterior Central": ["TuBu01", "TuBu06", "MeTu2"],
@@ -106,13 +107,13 @@ def sm17_map_by_dv_axis(plot_name="", plot_folder="", save_figure=True):
 
      
 
-def fafb_syn_counts(types, region, plot_name="Synapse Counts", plot_folder="",
+def fafb_syn_counts(neur_types, region, plot_name="Synapse Counts", plot_folder="",
                     y_axis="Synapse Count", save_figure=True):
     """Compares regional synaptic counts in the FAFB dataset.
 
     Parameters
     ----------
-    types : list-like
+    neur_types : list-like
         The MeTu neuron types to compare.
     region : str
         The region in which to compare synaptic counts.
@@ -131,7 +132,7 @@ def fafb_syn_counts(types, region, plot_name="Synapse Counts", plot_folder="",
         A dictionary that contains information about the neuron synaptic
         counts.
     """
-    mapping.add_types(types, output=False)
+    mapping.add_types(neur_types, output=False)
     
     class NeurModel(BaseModel):
         root_id: str
@@ -139,7 +140,7 @@ def fafb_syn_counts(types, region, plot_name="Synapse Counts", plot_folder="",
         syn_type: str
         y_ax: int
     neur_models = []
-    for i in types:
+    for i in neur_types:
         current_neurons = mapping.neur_ids[i]
         hemisphere = i[-1]
         syn_df = fw.fetch_synapses(current_neurons, 
@@ -161,7 +162,7 @@ def fafb_syn_counts(types, region, plot_name="Synapse Counts", plot_folder="",
     figures.strip_plot(data=full_df, 
                        x_label="Neuron Type", 
                        y_label=y_axis,
-                       order=types, 
+                       order=neur_types, 
                        hue="Synapse Type", 
                        plot_name=plot_name,
                        folder_path=[plot_folder],
@@ -170,14 +171,14 @@ def fafb_syn_counts(types, region, plot_name="Synapse Counts", plot_folder="",
     return full_df
 
 
-def full_comparison(types, region, plot_name="Synapse Counts", plot_folder="",
+def full_comparison(neur_types, region, plot_name="Synapse Counts", plot_folder="",
                     neu_outliers=[], y_axis="Synapse Count", 
                     save_figure=True):
     """Compares regional synaptic counts between both datasets.
 
     Parameters
     ----------
-    types : list-like
+    neur_types : list-like
         The MeTu neuron types to compare.
     region : str
         The region in which to compare synaptic counts.
@@ -198,13 +199,13 @@ def full_comparison(types, region, plot_name="Synapse Counts", plot_folder="",
         Dataframe with all neurons and their synaptic counts.
     """
     fafb_types, hemi_types = [], []
-    for i in types:
+    for i in neur_types:
         fafb_types += [f"{i}_L", f"{i}_R"]
         general_type = "MeTu3ab" if (i=="MeTu3a" or i=="MeTu3b") else i
         hemi_types.append(general_type)
     fafb_dict = fafb_syn_counts(fafb_types, region, y_axis=y_axis, 
                                 save_figure=False)
-    hemi_dict = neuread.hemi_syn_counts(types, region, 
+    hemi_dict = neuread.hemi_syn_counts(neur_types, region, 
                                         outliers=neu_outliers, y_axis=y_axis)
     
     left_hemi = False
@@ -225,7 +226,7 @@ def full_comparison(types, region, plot_name="Synapse Counts", plot_folder="",
     hemispheres = ["FAFB _L", "FAFB _R", "Hemibrain _R"]
     if left_hemi:
         hemispheres.insert(2, "Hemibrain _L")
-    for i in types:
+    for i in neur_types:
         temp_type = "MeTu3ab" if (i=="MeTu3a" or i=="MeTu3b") else i
         for j in hemispheres:
             temp_type2 = f"{j[:-2]}{temp_type}{j[-2:]}"
@@ -246,8 +247,8 @@ def full_comparison(types, region, plot_name="Synapse Counts", plot_folder="",
 
 def mt3_pre_connections(pre_types, plot_name="", plot_folder="",
                         save_figure=True):
-    """Stripplot of MeTu3 subtypes and their presynaptic connections to chosen
-        neurons
+    """Strip plot of MeTu3 subtypes and their presynaptic connections to chosen
+        neurons.
 
     Parameters
     ----------
@@ -327,21 +328,21 @@ def mt3_pre_connections(pre_types, plot_name="", plot_folder="",
 
 
     
-def tutu_comparison(save_figure=True, plot_name="TuTu Synapse Counts",
-                    plot_folder=""):
+def tutu_comparison(plot_name="TuTu Synapse Counts",
+                    plot_folder="", save_figure=True):
     """
     Makes a bar graph comparing the percentages of TuTu connections that are
         MeTu, TuBu, or other on the ipsilateral and contralateral sides.
 
     Parameters
     ----------
-    save_figure : bool, optional
-        Whether to save the figure. The default is True.
     plot_name : str, optional
         What the plot name would be upon saving it. The default is "TuTu Synapse
         Counts".
     plot_folder : str, optional
         The name of the folder to save the plots to. The default is "".
+    save_figure : bool, optional
+            Whether to save the figure. The default is True.
         
     Returns
     -------
@@ -450,10 +451,6 @@ def get_region_avg_counts(bihem_type, region, side, relevant_subregions={}):
         for j in syn_counts[i]:
             syn_counts[i][j] /= len(bihem_ids)
     return syn_counts
-        
-
-#radius_factor = 1/2000
-fig_size = tuple((34*4.8)/275 for _ in range(2))
 
 
 def make_pie_chart(syn_counts, bihem_type, region, side, folder_path=[]):
@@ -472,13 +469,15 @@ def make_pie_chart(syn_counts, bihem_type, region, side, folder_path=[]):
     side : str
         Either 'ipsi' or 'contra' for ipsilateral and contralateral connections
         respectively.
+    folder_path : list-like
+        The folder path to store the pie charts. The default is [].
     """
     colors = np.array(["#FF0000", "#00FFFF"])
     side = side.capitalize()
     radius_factor = 1/1000 if bihem_type=="AOTU046" else 1/2000
     folder_path += ["Pie Charts", region]
     for i in syn_counts:
-        fig, ax = plt.subplots(figsize=fig_size)
+        fig, ax = plt.subplots(figsize=pie_fig_size)
         temp_dict = syn_counts[i]
         pie_arr = np.array([temp_dict["pre"], temp_dict["post"]])
         total = temp_dict["pre"] + temp_dict["post"]
@@ -522,7 +521,7 @@ def make_bihem_pie_charts(plot_folder=""):
     for i,j in itertools.product(range(100, math.floor(highest_count)+500, 100),
                                  ("AOTU046","TuTu")):
         radius_factor = 1/1000 if j=="AOTU046" else 1/2000
-        fig, ax = plt.subplots(figsize=fig_size)
+        fig, ax = plt.subplots(figsize=pie_fig_size)
         radius = i*radius_factor
         color = ["#FF0000"]
         plt.pie([i], colors=color, radius=radius)
