@@ -146,7 +146,7 @@ def coord_str_to_list(coord):
     
     Parameters
     ----------
-    coords: str
+    coord: str
         "(x, y, z)"
     
     Returns
@@ -313,12 +313,12 @@ def make_importable_syn_coords(syn_df, pre_or_post="pre",
     coords = usable_coords(syn_df[f"{pre_or_post}_x"],
                            syn_df[f"{pre_or_post}_y"],
                            syn_df[f"{pre_or_post}_z"], True)
-    return importable_coords(coords, file_name = file_name)
+    return importable_coords(coords, file_name=file_name, save_file=save_file)
 
 
 def importable_coords(coords, file_name="Importable Coordinates",
                       save_file=True):
-    """Makes a csv file that can be imported into Flywire as annotations.
+    """Makes a csv file that can be imported into FlyWire as annotations.
         Stores it in the Importable-Coords folder.
 
     Parameters
@@ -380,6 +380,7 @@ def importable_coord_lines(coords1, coords2, file_name="Importable Lines"):
     relative_path = f"Importable-Coords/{file_name}.csv"
     file_path = os.path.join(absolute_path, relative_path)
     coord_df.to_csv(file_path, index=False)
+    return coord_df
 
 
 def count_instances(neurons, min_neurs=5):
