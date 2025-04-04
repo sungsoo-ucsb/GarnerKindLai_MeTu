@@ -91,9 +91,9 @@ def get_f1_score(true_positive, false_negative, false_positive):
     true_positive : int
         The number of items in both the pre-edited and post-edited neurons.
     false_negative : int
-        The number of items in the post-edited but not pre-edited neuron.
+        The number of items in the post-edited but not pre-edited neurons.
     false_positive : int
-        The number of items in the pre-edited but not post-edited neuron.
+        The number of items in the pre-edited but not post-edited neurons.
 
     Returns
     -------
@@ -106,7 +106,7 @@ def get_f1_score(true_positive, false_negative, false_positive):
     
         
 def get_f1_nodes(before_id, after_id):
-    """Get the F1 score comparing the nodes of a neuron before and after 
+    """Gets the F1 score comparing the nodes of a neuron before and after 
     editing.
     
     Parameters
@@ -214,7 +214,7 @@ def get_f1_synapses(before_id, after_id):
 
 @utils.time_elapsed
 def compare_f1_scores():
-    """Get the F1 cores of the nodes and synapses of MeTu_Change_Log neurons.
+    """Get the F1 Scores of the nodes and synapses of MeTu_Change_Log neurons.
 
     Returns
     -------
